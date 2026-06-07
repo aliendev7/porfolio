@@ -6,18 +6,21 @@ import { z } from "zod";
  * unchanged; these only gate and normalize inbound POST/PUT bodies.
  */
 
-/** Accepts a real string[] OR a comma-separated string and normalizes to string[]. */
-const stringList = z
-    .union([
-        z.array(z.string()),
-        z.string().transform((s) =>
-            s
-                .split(",")
-                .map((t) => t.trim())
-                .filter(Boolean)
-        ),
-    ])
-    .pipe(z.array(z.string()));
+/**
+ * Accepts a real string[] OR a comma-separated string. Kept as a plain union
+ * (no transform) for clean type inference; routes normalize the validated value
+ * to `string[]` with `toList()` before persisting.
+ */
+const stringList = z.union([z.array(z.string()), z.string()]);
+
+/** Normalize a validated string-or-comma-string field to a clean string[]. */
+export const toList = (value: string | string[]): string[] =>
+    Array.isArray(value)
+        ? value
+        : value
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean);
 
 const nonEmpty = (label: string) => z.string().trim().min(1, `${label} is required`);
 
@@ -63,6 +66,17 @@ export const experienceSchema = z.object({
     technologies: stringList,
 });
 export type ExperienceInput = z.infer<typeof experienceSchema>;
+
+// ── Education ───────────────────────────────────────────────────────────────
+export const educationSchema = z.object({
+    institution: nonEmpty("institution"),
+    degree: nonEmpty("degree"),
+    field: nonEmpty("field"),
+    startDate: z.coerce.date(),
+    endDate: z.coerce.date().optional().nullable(),
+    order: z.coerce.number().int().optional().default(0),
+});
+export type EducationInput = z.infer<typeof educationSchema>;
 
 // ── Skill ───────────────────────────────────────────────────────────────────
 export const skillSchema = z.object({

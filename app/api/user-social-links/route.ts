@@ -1,17 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import db from "../../../lib/db";
+import db from "@/lib/db";
+import { ok, serverError } from "@/lib/api";
 
-export async function GET(request: NextRequest, response: NextResponse) {
+export async function GET() {
     try {
-        const content = await db.userSocialLink.findMany();
-        return NextResponse.json(content);
-
+        const links = await db.userSocialLink.findMany();
+        return ok(links);
     } catch (error) {
-        console.log("ERROR: ", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to fetch content'
-        }, { status: 500 });
-
+        return serverError(error, "Failed to fetch social links");
     }
 }

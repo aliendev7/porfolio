@@ -1,18 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import db from "../../../lib/db";
+import db from "@/lib/db";
+import { ok, serverError } from "@/lib/api";
 
-
-export async function GET(request: NextRequest, response: NextResponse) {
+export async function GET() {
     try {
-        const content = await db.blog.findMany();
-        return NextResponse.json(content);
-
+        const blogs = await db.blog.findMany({ orderBy: { createdAt: "desc" } });
+        return ok(blogs);
     } catch (error) {
-        console.log("ERROR: ", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to fetch content'
-        });
-
+        return serverError(error, "Failed to fetch blogs");
     }
 }

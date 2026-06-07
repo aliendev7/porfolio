@@ -1,89 +1,63 @@
-import { NextRequest, NextResponse } from "next/server";
-import db from "../../../lib/db";
+import { NextRequest } from "next/server";
+import db from "@/lib/db";
+import { ok, created, fail, serverError, parseBody } from "@/lib/api";
+import { userDetailSchema } from "@/lib/validators";
 
-
-export async function GET(request: NextRequest, response: NextResponse) {
+export async function GET() {
     try {
-        const content = await db.userDetail.findFirst();
-        return NextResponse.json(content);
-
+        // Singleton: returns the single UserDetail row, or null if none exists.
+        // The frontend (`getHomeDataV2`) relies on receiving the object-or-null.
+        return ok(await db.userDetail.findFirst());
     } catch (error) {
-        console.log("ERROR: ", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to fetch content'
-        }, { status: 500 });
-
+        return serverError(error, "Failed to fetch user detail");
     }
 }
 
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
+        const parsed = await parseBody(request, userDetailSchema);
+        if ("response" in parsed) return parsed.response;
+        const { data } = parsed;
 
-        // Check if a user detail already exists
         const existing = await db.userDetail.findFirst();
-
-        if (existing) {
-            return NextResponse.json({
-                error: 'User detail already exists. Use PUT to update.',
-                message: 'User detail already exists'
-            }, { status: 400 });
-        }
+        if (existing) return fail(400, "User detail already exists. Use PUT to update.");
 
         const userDetail = await db.userDetail.create({
             data: {
-                welcomeTitle: body.welcomeTitle,
-                welcomeNote: body.welcomeNote,
-                welcomeDescription: body.welcomeDescription,
-                cvFile: body.cvFile || null,
-                userImage: body.userImage,
-            }
+                welcomeTitle: data.welcomeTitle,
+                welcomeNote: data.welcomeNote,
+                welcomeDescription: data.welcomeDescription,
+                cvFile: data.cvFile ?? null,
+                userImage: data.userImage,
+            },
         });
-
-        return NextResponse.json(userDetail, { status: 201 });
-
+        return created(userDetail);
     } catch (error) {
-        console.log("ERROR: ", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to create user detail'
-        }, { status: 500 });
+        return serverError(error, "Failed to create user detail");
     }
 }
 
 export async function PUT(request: NextRequest) {
     try {
-        const body = await request.json();
+        const parsed = await parseBody(request, userDetailSchema);
+        if ("response" in parsed) return parsed.response;
+        const { data } = parsed;
 
-        // Get the first (and should be only) user detail
         const existing = await db.userDetail.findFirst();
-
-        if (!existing) {
-            return NextResponse.json({
-                error: 'User detail not found',
-                message: 'User detail not found. Create one first.'
-            }, { status: 404 });
-        }
+        if (!existing) return fail(404, "User detail not found. Create one first.");
 
         const userDetail = await db.userDetail.update({
             where: { id: existing.id },
             data: {
-                welcomeTitle: body.welcomeTitle,
-                welcomeNote: body.welcomeNote,
-                welcomeDescription: body.welcomeDescription,
-                cvFile: body.cvFile || null,
-                userImage: body.userImage,
-            }
+                welcomeTitle: data.welcomeTitle,
+                welcomeNote: data.welcomeNote,
+                welcomeDescription: data.welcomeDescription,
+                cvFile: data.cvFile ?? null,
+                userImage: data.userImage,
+            },
         });
-
-        return NextResponse.json(userDetail);
-
+        return ok(userDetail);
     } catch (error) {
-        console.log("ERROR: ", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to update user detail'
-        }, { status: 500 });
+        return serverError(error, "Failed to update user detail");
     }
 }

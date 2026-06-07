@@ -1,100 +1,63 @@
-import { NextRequest, NextResponse } from "next/server";
-import db from "../../../../lib/db";
-
-// Helper function to generate a slug from a title
-function generateSlug(title: string): string {
-    return title
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-}
+import { NextRequest } from "next/server";
+import db from "@/lib/db";
+import { generateSlug } from "@/lib/slug-util";
+import { ok, fail, serverError, parseBody } from "@/lib/api";
+import { projectSchema, toList } from "@/lib/validators";
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
     try {
-        const { slug } = params;
         const project = await db.project.findUnique({
-            where: { slug },
-            include: {
-                tools: true,
-            },
+            where: { slug: params.slug },
+            include: { tools: true },
         });
-
-        if (!project) {
-            return NextResponse.json({ message: 'Project not found' }, { status: 404 });
-        }
-
-        return NextResponse.json(project);
+        if (!project) return fail(404, "Project not found");
+        return ok(project);
     } catch (error) {
-        console.error("ERROR fetching project:", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to fetch project'
-        }, { status: 500 });
+        return serverError(error, "Failed to fetch project");
     }
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { slug: string } }) {
     try {
-        const { slug } = params;
-        const body = await request.json();
-        const { title, description, content, coverImage, githubUrl, liveUrl, category, technologies, publishedAt } = body;
+        const parsed = await parseBody(request, projectSchema);
+        if ("response" in parsed) return parsed.response;
+        const { data } = parsed;
 
-        if (!title || !description || !content || !coverImage || !category || !technologies || !publishedAt) {
-            return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+        const newSlug = generateSlug(data.title);
+        if (newSlug !== params.slug) {
+            const clash = await db.project.findUnique({ where: { slug: newSlug } });
+            if (clash) return fail(409, "Project with this new title already exists");
         }
 
-        const newSlug = generateSlug(title);
-
-        // Check if the new slug already exists for another project
-        if (newSlug !== slug) {
-            const existingProjectWithNewSlug = await db.project.findUnique({
-                where: { slug: newSlug },
-            });
-            if (existingProjectWithNewSlug) {
-                return NextResponse.json({ message: 'Project with this new title already exists' }, { status: 409 });
-            }
-        }
-
-        const updatedProject = await db.project.update({
-            where: { slug },
+        const updated = await db.project.update({
+            where: { slug: params.slug },
             data: {
-                title,
+                title: data.title,
                 slug: newSlug,
-                description,
-                content,
-                coverImage,
-                githubUrl,
-                liveUrl,
-                category,
-                technologies,
-                publishedAt: new Date(publishedAt),
+                description: data.description,
+                content: data.content,
+                coverImage: data.coverImage,
+                cover: data.coverImage, // legacy mirror
+                githubUrl: data.githubUrl ?? null,
+                liveUrl: data.liveUrl ?? null,
+                link: data.liveUrl ?? data.githubUrl ?? "", // legacy mirror
+                about: data.description, // legacy mirror
+                category: data.category,
+                technologies: toList(data.technologies),
+                publishedAt: data.publishedAt,
             },
         });
-
-        return NextResponse.json(updatedProject);
+        return ok(updated);
     } catch (error) {
-        console.error("ERROR updating project:", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to update project'
-        }, { status: 500 });
+        return serverError(error, "Failed to update project");
     }
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
     try {
-        const { slug } = params;
-        await db.project.delete({
-            where: { slug },
-        });
-        return NextResponse.json({ message: 'Project deleted successfully' }, { status: 200 });
+        await db.project.delete({ where: { slug: params.slug } });
+        return ok({ message: "Project deleted successfully" });
     } catch (error) {
-        console.error("ERROR deleting project:", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to delete project'
-        }, { status: 500 });
+        return serverError(error, "Failed to delete project");
     }
 }

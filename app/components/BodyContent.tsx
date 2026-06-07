@@ -1,48 +1,44 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useCallback } from "react";
 import { HomeDataType, SocialLinkType } from "./types/types";
 import SocialLink from "./SocialLink";
-import { useCallback } from "react";
 import { useLanguage } from "../providers/LanguageProvider";
 import { saveAs } from "file-saver";
-import { Download, ArrowUpRight } from "lucide-react";
+import { Download, ArrowUpRight, Loader2 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
+import { toast } from "sonner";
 
 interface ContentType {
   homeData: HomeDataType | null;
   socialLinks: SocialLinkType[];
 }
 
-const downloadPDF = async (url: string) => {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-    const blob = await response.blob();
-    return blob;
-  } catch (error) {
-    console.error("Error fetching PDF:", error);
-    throw error;
-  }
-};
-
 const BodyContent = ({ homeData, socialLinks }: ContentType) => {
   const userImage = homeData?.userImage || "";
   const { t } = useLanguage();
   const reduce = useReducedMotion();
+  const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleViewAndDownload = useCallback(() => {
+  const handleDownloadCV = useCallback(async () => {
     if (!homeData?.cvFile) return;
 
-    window.open(homeData.cvFile, "_blank");
-
-    downloadPDF(homeData.cvFile).then((blob) => {
+    setIsDownloading(true);
+    try {
+      const response = await fetch(homeData.cvFile);
+      if (!response.ok) throw new Error("Failed to fetch CV");
+      const blob = await response.blob();
       const fileName = homeData.cvFile.split('/').pop() || 'CV.pdf';
       saveAs(blob, fileName);
-    });
-  }, [homeData?.cvFile]);
+      toast.success(t.common.downloadCV, { description: "Your CV is being downloaded" });
+    } catch (error) {
+      console.error("Error downloading CV:", error);
+      toast.error("Download failed", { description: "Could not download CV. Please try again." });
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [homeData?.cvFile, t]);
 
   // Split the headline so the final word carries the luminous mint accent.
   const headline = (homeData?.welcomeNote || "").trim();
@@ -115,11 +111,17 @@ const BodyContent = ({ homeData, socialLinks }: ContentType) => {
               type="button"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              onClick={handleViewAndDownload}
-              className="focus-ring sheen group relative flex items-center gap-3 overflow-hidden rounded-full bg-brand-green px-7 py-3.5 font-semibold text-white shadow-[0_0_30px_-6px_hsl(var(--brand-green))] transition-shadow duration-300 hover:shadow-[0_0_50px_-4px_hsl(var(--brand-green))] dark:text-[#03100E]"
+              onClick={handleDownloadCV}
+              disabled={isDownloading}
+              aria-label={t.common.downloadCV}
+              className="focus-ring sheen group relative flex items-center gap-3 overflow-hidden rounded-full bg-brand-green px-7 py-3.5 font-semibold text-white shadow-[0_0_30px_-6px_hsl(var(--brand-green))] transition-shadow duration-300 hover:shadow-[0_0_50px_-4px_hsl(var(--brand-green))] disabled:opacity-70 disabled:cursor-not-allowed dark:text-[#03100E]"
             >
-              <span className="relative z-10">{t.common.downloadCV}</span>
-              <Download className="relative z-10 h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+              {isDownloading ? (
+                <Loader2 className="relative z-10 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="relative z-10 h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+              )}
+              <span className="relative z-10">{isDownloading ? "Downloading..." : t.common.downloadCV}</span>
             </motion.button>
           )}
 

@@ -1,102 +1,62 @@
-import { NextRequest, NextResponse } from "next/server";
-import db from "../../../../lib/db";
-
-// Helper function to generate a slug from a title
-function generateSlug(title: string): string {
-    return title
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-}
+import { NextRequest } from "next/server";
+import db from "@/lib/db";
+import { generateSlug } from "@/lib/slug-util";
+import { ok, fail, serverError, parseBody } from "@/lib/api";
+import { resourceSchema, toList } from "@/lib/validators";
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
     try {
-        const { slug } = params;
         const resource = await db.resource.findUnique({
-            where: { slug },
-            include: {
-                category: true,
-            },
+            where: { slug: params.slug },
+            include: { category: true },
         });
-
-        if (!resource) {
-            return NextResponse.json({ message: 'Resource not found' }, { status: 404 });
-        }
-
-        return NextResponse.json(resource);
+        if (!resource) return fail(404, "Resource not found");
+        return ok(resource);
     } catch (error) {
-        console.error("ERROR fetching resource:", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to fetch resource'
-        }, { status: 500 });
+        return serverError(error, "Failed to fetch resource");
     }
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { slug: string } }) {
     try {
-        const { slug } = params;
-        const body = await request.json();
-        const { title, description, content, coverImage, link, type, categoryId, tags, author, publishedAt, readTimeMinutes } = body;
+        const parsed = await parseBody(request, resourceSchema);
+        if ("response" in parsed) return parsed.response;
+        const { data } = parsed;
 
-        if (!title || !description || !content || !coverImage || !type || !categoryId || !tags || !author || !publishedAt) {
-            return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+        const newSlug = generateSlug(data.title);
+        if (newSlug !== params.slug) {
+            const clash = await db.resource.findUnique({ where: { slug: newSlug } });
+            if (clash) return fail(409, "Resource with this new title already exists");
         }
 
-        const newSlug = generateSlug(title);
-
-        // Check if the new slug already exists for another resource
-        if (newSlug !== slug) {
-            const existingResourceWithNewSlug = await db.resource.findUnique({
-                where: { slug: newSlug },
-            });
-            if (existingResourceWithNewSlug) {
-                return NextResponse.json({ message: 'Resource with this new title already exists' }, { status: 409 });
-            }
-        }
-
-        const updatedResource = await db.resource.update({
-            where: { slug },
+        const updated = await db.resource.update({
+            where: { slug: params.slug },
             data: {
-                title,
+                title: data.title,
                 slug: newSlug,
-                description,
-                content,
-                coverImage,
-                link,
-                type,
-                categoryId,
-                tags,
-                author,
-                publishedAt: new Date(publishedAt),
-                readTimeMinutes: readTimeMinutes ? parseInt(readTimeMinutes) : undefined,
+                description: data.description,
+                content: data.content,
+                coverImage: data.coverImage,
+                link: data.link ?? null,
+                type: data.type,
+                categoryId: data.categoryId,
+                tags: toList(data.tags),
+                author: data.author,
+                publishedAt: data.publishedAt,
+                readTimeMinutes: data.readTimeMinutes ?? undefined,
             },
         });
-
-        return NextResponse.json(updatedResource);
+        return ok(updated);
     } catch (error) {
-        console.error("ERROR updating resource:", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to update resource'
-        }, { status: 500 });
+        return serverError(error, "Failed to update resource");
     }
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
     try {
-        const { slug } = params;
-        await db.resource.delete({
-            where: { slug },
-        });
-        return NextResponse.json({ message: 'Resource deleted successfully' }, { status: 200 });
+        await db.resource.delete({ where: { slug: params.slug } });
+        return ok({ message: "Resource deleted successfully" });
     } catch (error) {
-        console.error("ERROR deleting resource:", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to delete resource'
-        }, { status: 500 });
+        return serverError(error, "Failed to delete resource");
     }
 }

@@ -8,7 +8,7 @@ import { useLanguage } from "../providers/LanguageProvider";
 import { format } from "date-fns";
 import { es, enUS } from "date-fns/locale";
 
-const ProjectCard = ({ project, index = 0 }: { project: ProjectType; index?: number }) => {
+const ProjectCard = ({ project, index = 0, isNew = false }: { project: ProjectType; index?: number; isNew?: boolean }) => {
     const [showTool, setShowTool] = useState(false);
     const { lang, t } = useLanguage();
     const reduce = useReducedMotion();
@@ -50,8 +50,13 @@ const ProjectCard = ({ project, index = 0 }: { project: ProjectType; index?: num
 
                 {/* Top badges */}
                 <div className="absolute top-4 left-4 flex items-center gap-2">
+                    {isNew && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-green px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-brand-green/30">
+                            New
+                        </span>
+                    )}
                     {project.category && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-green/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-black/40 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
                             <Folder className="h-3 w-3" />
                             {project.category}
                         </span>

@@ -13,7 +13,7 @@ interface FeaturedProjectsProps {
 export const FeaturedProjects = ({ projects }: FeaturedProjectsProps) => {
   const { t } = useLanguage();
   const reduce = useReducedMotion();
-  const featuredProjects = (projects || []).slice(0, 2);
+  const featuredProjects = (projects || []).slice(0, 3);
 
   if (featuredProjects.length === 0) return null;
 

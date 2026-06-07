@@ -1,6 +1,7 @@
 "use client";
 import { ProjectType } from "../types/types";
 import { useLanguage } from "../../providers/LanguageProvider";
+import { useReducedMotion } from "framer-motion";
 
 interface TechMarqueeProps {
   projects: ProjectType[];
@@ -22,6 +23,7 @@ const FALLBACK_TECH = [
 
 export const TechMarquee = ({ projects }: TechMarqueeProps) => {
   const { t } = useLanguage();
+  const reduce = useReducedMotion();
 
   const derived = Array.from(
     new Set(
@@ -56,7 +58,7 @@ export const TechMarquee = ({ projects }: TechMarqueeProps) => {
       </p>
 
       <div className="marquee-mask overflow-hidden">
-        <div className="animate-marquee pause-hover flex w-max items-center gap-10">
+        <div className={`${reduce ? "" : "animate-marquee pause-hover"} flex w-max items-center gap-10`}>
           {renderGroup(false)}
           {renderGroup(true)}
         </div>

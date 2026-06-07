@@ -226,6 +226,12 @@
       "type": "file"
     },
     {
+      "path": "app\\api\\projects\\route.ts",
+      "accessCount": 8,
+      "lastAccessed": 1780817939104,
+      "type": "file"
+    },
+    {
       "path": "app\\components\\home\\ContactCTA.tsx",
       "accessCount": 7,
       "lastAccessed": 1780719966747,
@@ -241,6 +247,12 @@
       "path": "app\\components\\header.tsx",
       "accessCount": 7,
       "lastAccessed": 1780721054095,
+      "type": "file"
+    },
+    {
+      "path": "app\\api\\resources\\route.ts",
+      "accessCount": 7,
+      "lastAccessed": 1780817912067,
       "type": "file"
     },
     {
@@ -281,8 +293,14 @@
     },
     {
       "path": "lib\\slug-util.ts",
+      "accessCount": 6,
+      "lastAccessed": 1780818144138,
+      "type": "file"
+    },
+    {
+      "path": "prisma\\schema.prisma",
       "accessCount": 5,
-      "lastAccessed": 1780802796088,
+      "lastAccessed": 1780818161737,
       "type": "file"
     },
     {
@@ -307,24 +325,6 @@
       "path": "lib\\db.ts",
       "accessCount": 4,
       "lastAccessed": 1780800882178,
-      "type": "file"
-    },
-    {
-      "path": "app\\api\\resources\\route.ts",
-      "accessCount": 4,
-      "lastAccessed": 1780801044789,
-      "type": "file"
-    },
-    {
-      "path": "app\\api\\projects\\route.ts",
-      "accessCount": 4,
-      "lastAccessed": 1780801045608,
-      "type": "file"
-    },
-    {
-      "path": "prisma\\schema.prisma",
-      "accessCount": 4,
-      "lastAccessed": 1780801090326,
       "type": "file"
     },
     {

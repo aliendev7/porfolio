@@ -66,7 +66,7 @@ const Projects = async () => {
 
                 <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
                     {projects?.map((item, i) => (
-                        <ProjectCard key={item.id || i} project={item} index={i} />
+                        <ProjectCard key={item.id || i} project={item} index={i} isNew={i === 0} />
                     ))}
                 </div>
 

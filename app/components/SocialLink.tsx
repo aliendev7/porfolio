@@ -21,7 +21,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
 const SocialLink = ({item}:{item: SocialLinkType}) => {
   const Icon = iconMap[item.icon] || Globe;
   return (
-    <a href={item.link} target="_blank" className="block w-full h-full flex items-center justify-center text-gray-700 dark:text-white" rel="noreferrer">
+    <a href={item.link} target="_blank" aria-label={item.name} className="block w-full h-full flex items-center justify-center text-gray-700 dark:text-white" rel="noreferrer">
       <Icon size={24} />
     </a>
   )

@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Download, ArrowUpRight } from "lucide-react";
 import { HomeDataType, SocialLinkType } from "../types/types";
@@ -64,13 +63,13 @@ export const ContactCTA = ({ homeData, socialLinks }: ContactCTAProps) => {
                 <Download className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
               </a>
             )}
-            <Link
-              href="/about"
+            <a
+              href="mailto:cardenascode7@outlook.com"
               className="focus-ring group flex items-center gap-2 rounded-full border border-gray-300 px-6 py-3.5 font-medium text-gray-700 transition-colors hover:border-brand-green hover:text-brand-medium dark:border-white/20 dark:text-gray-200 dark:hover:border-brand-green dark:hover:text-brand-green"
             >
               <span>{t.about.sendEmail}</span>
               <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </Link>
+            </a>
           </div>
 
           {socialLinks?.length > 0 && (

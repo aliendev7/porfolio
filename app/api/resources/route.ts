@@ -1,93 +1,60 @@
-import { NextRequest, NextResponse } from "next/server";
-import db from "../../../lib/db";
-
-// Helper function to generate a slug from a title
-function generateSlug(title: string): string {
-    return title
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-}
+import { NextRequest } from "next/server";
+import db from "@/lib/db";
+import { generateSlug } from "@/lib/slug-util";
+import { ok, created, fail, serverError, parseBody } from "@/lib/api";
+import { resourceSchema, toList } from "@/lib/validators";
 
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
-        const categoryId = searchParams.get('categoryId');
-        const tags = searchParams.get('tags')?.split(',');
-        const type = searchParams.get('type');
+        const categoryId = searchParams.get("categoryId");
+        const tags = searchParams.get("tags")?.split(",");
+        const type = searchParams.get("type");
 
         const where: any = {};
-        if (categoryId) {
-            where.categoryId = categoryId;
-        }
-        if (tags && tags.length > 0) {
-            where.tags = { hasEvery: tags };
-        }
-        if (type) {
-            where.type = type;
-        }
+        if (categoryId) where.categoryId = categoryId;
+        if (tags && tags.length > 0) where.tags = { hasEvery: tags };
+        if (type) where.type = type;
 
         const resources = await db.resource.findMany({
             where,
-            include: {
-                category: true, // Include category details
-            },
+            include: { category: true },
+            orderBy: { publishedAt: "desc" },
         });
-        return NextResponse.json(resources);
+        return ok(resources);
     } catch (error) {
-        console.error("ERROR fetching resources:", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to fetch resources'
-        }, { status: 500 });
+        return serverError(error, "Failed to fetch resources");
     }
 }
 
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
-        const { title, description, content, coverImage, link, type, categoryId, tags, author, publishedAt, readTimeMinutes } = body;
+        const parsed = await parseBody(request, resourceSchema);
+        if ("response" in parsed) return parsed.response;
+        const { data } = parsed;
 
-        if (!title || !description || !content || !coverImage || !type || !categoryId || !tags || !author || !publishedAt) {
-            return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
-        }
-
-        const slug = generateSlug(title);
-
-        // Check if a resource with the same slug already exists
-        const existingResource = await db.resource.findUnique({
-            where: { slug },
-        });
-
-        if (existingResource) {
-            return NextResponse.json({ message: 'Resource with this title already exists' }, { status: 409 });
-        }
+        const slug = generateSlug(data.title);
+        const existing = await db.resource.findUnique({ where: { slug } });
+        if (existing) return fail(409, "Resource with this title already exists");
 
         const newResource = await db.resource.create({
             data: {
-                title,
+                title: data.title,
                 slug,
-                description,
-                content,
-                coverImage,
-                link,
-                type,
-                categoryId,
-                tags,
-                author,
-                publishedAt: new Date(publishedAt),
-                readTimeMinutes: readTimeMinutes ? parseInt(readTimeMinutes) : undefined,
+                description: data.description,
+                content: data.content,
+                coverImage: data.coverImage,
+                link: data.link ?? null,
+                type: data.type,
+                categoryId: data.categoryId,
+                tags: toList(data.tags),
+                author: data.author,
+                publishedAt: data.publishedAt,
+                readTimeMinutes: data.readTimeMinutes ?? undefined,
             },
         });
-
-        return NextResponse.json(newResource, { status: 201 });
+        return created(newResource);
     } catch (error) {
-        console.error("ERROR creating resource:", error);
-        return NextResponse.json({
-            error,
-            message: 'Failed to create resource'
-        }, { status: 500 });
+        return serverError(error, "Failed to create resource");
     }
 }

@@ -1,91 +1,65 @@
-import { NextRequest, NextResponse } from "next/server";
-import db from "../../../../lib/db";
+import { NextRequest } from "next/server";
+import db from "@/lib/db";
 import { generateSlug } from "@/lib/slug-util";
+import { ok, fail, serverError, parseBody } from "@/lib/api";
+import { skillCategorySchema } from "@/lib/validators";
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
-  try {
-    const { slug } = params;
-    const category = await db.skillCategory.findUnique({
-      where: { slug },
-      include: {
-        skills: {
-          orderBy: { order: "asc" }
-        }
-      }
-    });
-
-    if (!category) {
-      return NextResponse.json({ message: 'Skill category not found' }, { status: 404 });
+    try {
+        const category = await db.skillCategory.findUnique({
+            where: { slug: params.slug },
+            include: { skills: { orderBy: { order: "asc" } } },
+        });
+        if (!category) return fail(404, "Skill category not found");
+        return ok(category);
+    } catch (error) {
+        return serverError(error, "Failed to fetch skill category");
     }
-
-    return NextResponse.json(category);
-  } catch (error) {
-    console.error("ERROR fetching skill category:", error);
-    return NextResponse.json({ error, message: 'Failed to fetch skill category' }, { status: 500 });
-  }
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { slug: string } }) {
-  try {
-    const { slug } = params;
-    const body = await request.json();
-    const { name, description, icon, color, order } = body;
+    try {
+        const parsed = await parseBody(request, skillCategorySchema);
+        if ("response" in parsed) return parsed.response;
+        const { data } = parsed;
 
-    if (!name) {
-      return NextResponse.json({ message: 'Name is required' }, { status: 400 });
+        const newSlug = generateSlug(data.name);
+        if (newSlug !== params.slug) {
+            const clash = await db.skillCategory.findUnique({ where: { slug: newSlug } });
+            if (clash) return fail(409, "Category with this new name already exists");
+        }
+
+        const updated = await db.skillCategory.update({
+            where: { slug: params.slug },
+            data: {
+                name: data.name,
+                slug: newSlug,
+                description: data.description ?? null,
+                icon: data.icon ?? null,
+                color: data.color ?? null,
+                order: data.order,
+            },
+        });
+        return ok(updated);
+    } catch (error) {
+        return serverError(error, "Failed to update skill category");
     }
-
-    const newSlug = generateSlug(name);
-    if (newSlug !== slug) {
-      const existingCategoryWithNewSlug = await db.skillCategory.findUnique({ where: { slug: newSlug } });
-      if (existingCategoryWithNewSlug) {
-        return NextResponse.json({ message: 'Category with this new name already exists' }, { status: 409 });
-      }
-    }
-
-    const updatedCategory = await db.skillCategory.update({
-      where: { slug },
-      data: {
-        name,
-        slug: newSlug,
-        description: description || null,
-        icon: icon || null,
-        color: color || null,
-        order: order || 0,
-      },
-    });
-
-    return NextResponse.json(updatedCategory);
-  } catch (error) {
-    console.error("ERROR updating skill category:", error);
-    return NextResponse.json({ error, message: 'Failed to update skill category' }, { status: 500 });
-  }
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
-  try {
-    const { slug } = params;
+    try {
+        const category = await db.skillCategory.findUnique({
+            where: { slug: params.slug },
+            include: { skills: true },
+        });
+        if (!category) return fail(404, "Category not found");
+        if (category.skills.length > 0) {
+            return fail(400, "Cannot delete category with existing skills. Please delete or reassign the skills first.");
+        }
 
-    // Check if category has skills
-    const category = await db.skillCategory.findUnique({
-      where: { slug },
-      include: { skills: true }
-    });
-
-    if (!category) {
-      return NextResponse.json({ message: 'Category not found' }, { status: 404 });
+        await db.skillCategory.delete({ where: { slug: params.slug } });
+        return ok({ message: "Skill category deleted successfully" });
+    } catch (error) {
+        return serverError(error, "Failed to delete skill category");
     }
-
-    if (category.skills.length > 0) {
-      return NextResponse.json({
-        message: 'Cannot delete category with existing skills. Please delete or reassign the skills first.'
-      }, { status: 400 });
-    }
-
-    await db.skillCategory.delete({ where: { slug } });
-    return NextResponse.json({ message: 'Skill category deleted successfully' });
-  } catch (error) {
-    console.error("ERROR deleting skill category:", error);
-    return NextResponse.json({ error, message: 'Failed to delete skill category' }, { status: 500 });
-  }
 }
