@@ -19,13 +19,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import ImageUpload from "@/app/components/ui/image-upload";
+import FileUpload from "@/app/components/ui/file-upload";
 
 // Validation schema
 const profileSchema = z.object({
   welcomeTitle: z.string().min(3, 'Title must be at least 3 characters'),
   welcomeNote: z.string().min(3, 'Note must be at least 3 characters'),
   welcomeDescription: z.string().min(10, 'Description must be at least 10 characters'),
-  cvFile: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  cvFile: z.string().optional().or(z.literal('')),
   userImage: z.string().url('Must be a valid URL'),
 });
 
@@ -57,6 +58,7 @@ const ProfilePage = () => {
   });
 
   const userImageValue = watch('userImage');
+  const cvFileValue = watch('cvFile');
 
   // Load profile data into form when fetched
   useEffect(() => {
@@ -74,7 +76,7 @@ const ProfilePage = () => {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
-      const res = await fetch(`/api/user-details${profile?.id ? `/${profile.id}` : ''}`, {
+      const res = await fetch('/api/user-details', {
         method: profile?.id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -211,23 +213,17 @@ const ProfilePage = () => {
 
             {/* CV File */}
             <div className="space-y-2">
-              <Label htmlFor="cvFile">
-                CV File URL
+              <Label>
+                CV / Resume
                 <Badge variant="outline" className="ml-2">Optional</Badge>
               </Label>
-              <Input
-                id="cvFile"
-                type="url"
-                placeholder="https://example.com/cv.pdf"
-                {...register('cvFile')}
-                className={errors.cvFile ? 'border-red-500' : ''}
+              <FileUpload
+                value={cvFileValue}
+                onChange={(url) => setValue('cvFile', url, { shouldValidate: true })}
               />
               {errors.cvFile && (
                 <p className="text-sm text-red-500">{errors.cvFile.message}</p>
               )}
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Link to your CV/Resume PDF file
-              </p>
             </div>
           </CardContent>
         </Card>

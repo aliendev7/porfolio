@@ -2,18 +2,37 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { type ColumnDef } from '@tanstack/react-table';
 import { Briefcase } from 'lucide-react';
 import { fetchJSON } from '../../../lib/request-util';
 import { formatTableDate } from '../../../lib/date-utils';
-import CRUDTable from '@/app/components/dashboard/CRUDTable';
+import DataTable from '@/app/components/dashboard/DataTable';
 import { ExperienceType } from '../../components/types/types';
 import ExperienceForm from '../components/ExperienceForm';
 import PageHeader from '../components/PageHeader';
 
 const fetchExperiences = async (): Promise<ExperienceType[]> => {
-  const data = await fetchJSON<ExperienceType[]>(`${process.env.NEXT_PUBLIC_API_URL}/api/experiences`);
+  const data = await fetchJSON<ExperienceType[]>("/api/experiences");
   return data ?? [];
 };
+
+const experienceColumns: ColumnDef<ExperienceType, any>[] = [
+  { accessorKey: 'title', header: 'Title' },
+  { accessorKey: 'company', header: 'Company' },
+  {
+    accessorKey: 'startDate',
+    header: 'Start Date',
+    cell: ({ getValue }) => formatTableDate(getValue() as string),
+  },
+  {
+    accessorKey: 'endDate',
+    header: 'End Date',
+    cell: ({ getValue }) => {
+      const value = getValue() as string | null;
+      return value ? formatTableDate(value) : 'Present';
+    },
+  },
+];
 
 const ExperiencesAdmin = () => {
   const { isPending, isError, data: experiences, error, refetch } = useQuery({
@@ -21,32 +40,18 @@ const ExperiencesAdmin = () => {
     queryFn: fetchExperiences,
   });
 
-  if (isPending) return <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green"></div></div>;
-  if (isError) return <div className="text-center py-12 text-red-600 dark:text-red-400">Error: {error?.message}</div>;
-
   return (
     <div className="space-y-6">
-      <PageHeader
-        icon={Briefcase}
-        title="Experiences"
-        description="Manage your work history and professional experience"
+      <PageHeader icon={Briefcase} title="Experiences" description="Manage your work history and professional experience" />
+      <DataTable<ExperienceType>
+        entityName="Experience"
+        data={experiences ?? []}
+        columns={experienceColumns}
+        apiEndpoint="/api/experiences"
+        FormComponent={ExperienceForm}
+        onDataUpdate={refetch}
+        loading={isPending}
       />
-      {experiences && (
-        <CRUDTable
-          entityName="Experience"
-          rowData={experiences}
-          columnDefs={[
-            { headerName: 'Title', field: 'title' },
-            { headerName: 'Company', field: 'company' },
-            { headerName: 'Start Date', field: 'startDate', cellRenderer: ({ value }: { value: string }) => formatTableDate(value) },
-            { headerName: 'End Date', field: 'endDate', cellRenderer: ({ value }: { value: string | null }) => value ? formatTableDate(value) : 'Present' },
-            { headerName: 'Slug', field: 'slug', hide: true },
-          ]}
-          apiEndpoint={`${process.env.NEXT_PUBLIC_API_URL}/api/experiences`}
-          FormComponent={ExperienceForm}
-          onDataUpdate={refetch}
-        />
-      )}
     </div>
   );
 };

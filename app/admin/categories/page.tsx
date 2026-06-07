@@ -2,17 +2,23 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { type ColumnDef } from '@tanstack/react-table';
 import { FolderTree } from 'lucide-react';
 import { fetchJSON } from '../../../lib/request-util';
 import { ResourceCategoryType } from '../../components/types/types';
 import CategoryForm from '../components/CategoryForm';
-import CRUDTable from '@/app/components/dashboard/CRUDTable';
+import DataTable from '@/app/components/dashboard/DataTable';
 import PageHeader from '../components/PageHeader';
 
 const fetchCategories = async (): Promise<ResourceCategoryType[]> => {
-  const data = await fetchJSON<ResourceCategoryType[]>(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
+  const data = await fetchJSON<ResourceCategoryType[]>("/api/categories");
   return data ?? [];
 };
+
+const categoryColumns: ColumnDef<ResourceCategoryType, any>[] = [
+  { accessorKey: 'name', header: 'Name' },
+  { accessorKey: 'slug', header: 'Slug' },
+];
 
 const CategoriesAdmin = () => {
   const { isPending, isError, data: categories, error, refetch } = useQuery({
@@ -20,29 +26,18 @@ const CategoriesAdmin = () => {
     queryFn: fetchCategories,
   });
 
-  if (isPending) return <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green"></div></div>;
-  if (isError) return <div className="text-center py-12 text-red-600 dark:text-red-400">Error: {error?.message}</div>;
-
   return (
     <div className="space-y-6">
-      <PageHeader
-        icon={FolderTree}
-        title="Categories"
-        description="Organize your learning resources into categories"
+      <PageHeader icon={FolderTree} title="Categories" description="Organize your learning resources into categories" />
+      <DataTable<ResourceCategoryType>
+        entityName="Category"
+        data={categories ?? []}
+        columns={categoryColumns}
+        apiEndpoint="/api/categories"
+        FormComponent={CategoryForm}
+        onDataUpdate={refetch}
+        loading={isPending}
       />
-      {categories && (
-        <CRUDTable
-          entityName="Category"
-          rowData={categories}
-          columnDefs={[
-            { headerName: 'Name', field: 'name' },
-            { headerName: 'Slug', field: 'slug' },
-          ]}
-          apiEndpoint={`${process.env.NEXT_PUBLIC_API_URL}/api/categories`}
-          FormComponent={CategoryForm}
-          onDataUpdate={refetch}
-        />
-      )}
     </div>
   );
 };

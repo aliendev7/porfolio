@@ -84,3 +84,124 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Shared visible focus ring for cinematic dark/light interactive elements */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#FBF6EA] dark:focus-visible:ring-offset-[#03100E];
+  }
+}
+
+@layer utilities {
+  /* Keep anchored sections (#about, #featured) clear of the fixed header */
+  .scroll-anchor {
+    scroll-margin-top: 7rem;
+  }
+
+  /* Film-grain overlay — inline SVG turbulence, no asset file */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+  }
+  .dark .grain::after {
+    opacity: 0.12;
+    mix-blend-mode: soft-light;
+  }
+
+  /* Luminous mint text glow for accent words (dark theme leans in) */
+  .text-glow {
+    text-shadow: 0 0 28px hsl(var(--brand-green) / 0.35);
+  }
+  .dark .text-glow {
+    text-shadow: 0 0 34px hsl(var(--brand-green) / 0.55),
+      0 0 70px hsl(var(--brand-green) / 0.25);
+  }
+
+  /* Edge fade for the tech marquee */
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+  }
+
+  .pause-hover:hover {
+    animation-play-state: paused;
+  }
+
+  /* Animated mint→teal gradient text for accent words */
+  .text-gradient {
+    background-image: linear-gradient(
+      100deg,
+      hsl(var(--brand-green)),
+      hsl(var(--brand-medium)),
+      hsl(var(--brand-green))
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Light sweep that crosses an element on hover (modern button sheen) */
+  .sheen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      110deg,
+      transparent 25%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 75%
+    );
+    transform: translateX(-150%);
+    transition: transform 0.7s ease;
+    pointer-events: none;
+  }
+  .sheen:hover::before {
+    transform: translateX(150%);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee,
+  .animate-marquee-reverse,
+  .animate-glow-pulse,
+  .animate-float,
+  .animate-drift-slow,
+  .animate-aurora,
+  .animate-shimmer {
+    animation: none !important;
+  }
+  .text-gradient {
+    background-size: 100% auto;
+  }
+  .sheen::before {
+    display: none;
+  }
+}

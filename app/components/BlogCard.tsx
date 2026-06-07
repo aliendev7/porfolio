@@ -2,66 +2,68 @@
 import { BlogType } from "./types/types";
 import { ExternalLink, Calendar, Clock } from "lucide-react";
 import { useLanguage } from "../providers/LanguageProvider";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 
 export const BlogCard = ({ blog }: { blog: BlogType }) => {
     const { t } = useLanguage();
-    
+    const reduce = useReducedMotion();
+
     return (
-        <motion.a 
-            href={blog.link} 
-            target="_blank" 
+        <motion.a
+            href={blog.link}
+            target="_blank"
             rel="noreferrer"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -8 }}
-            className="group relative block h-[420px] w-full rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+            initial={reduce ? false : { opacity: 0, y: 20 }}
+            animate={reduce ? undefined : { opacity: 1, y: 0 }}
+            whileHover={reduce ? undefined : { y: -8 }}
+            className="focus-ring group relative block h-[420px] w-full overflow-hidden rounded-[1.75rem] border border-gray-200/70 shadow-lg transition-all duration-500 hover:border-brand-green/40 hover:shadow-[0_0_50px_-12px_hsl(var(--brand-green))] dark:border-white/10"
         >
             {/* Background Image */}
             <div className="absolute inset-0">
-                <Image 
+                <Image
                     src={blog.cover || '/placeholder-blog.jpg'}
                     alt={blog.title}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
                 />
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"/>
+                {/* Cinematic teal grade */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#03100E]/95 via-[#03100E]/40 to-transparent" />
             </div>
 
             {/* Content */}
-            <div className="absolute inset-0 p-6 flex flex-col justify-between">
+            <div className="absolute inset-0 flex flex-col justify-between p-6">
                 {/* Top Badge */}
                 <div className="flex justify-end">
-                    <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full">
-                        <span className="text-white text-[10px] font-medium">Article</span>
+                    <div className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-md">
+                        <span className="font-mono text-[10px] uppercase tracking-wide text-white/90">Article</span>
                     </div>
                 </div>
 
                 {/* Bottom Content */}
                 <div className="space-y-4">
-                    <h3 className="text-xl md:text-2xl font-bold text-white font-poiret leading-tight line-clamp-2">
+                    <h3 className="line-clamp-2 font-poiret text-xl font-bold leading-tight text-white md:text-2xl">
                         {blog.title}
                     </h3>
-                    
-                    <div className="flex items-center gap-4 text-gray-300 text-xs">
+
+                    <div className="flex items-center gap-4 font-mono text-[11px] text-gray-300">
                         <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
+                            <Calendar className="h-3.5 w-3.5" />
                             <span>{new Date(blog.createdAt || Date.now()).toLocaleDateString()}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4" />
+                            <Clock className="h-3.5 w-3.5" />
                             <span>5 min read</span>
                         </div>
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <span className="text-brand-light text-sm font-medium">
+                        <span className="text-sm font-medium text-brand-light">
                             {t.common.readMore}
                         </span>
-                        <div className="bg-white/10 group-hover:bg-brand-green backdrop-blur-md p-3 rounded-full transition-all duration-300">
-                            <ExternalLink className="w-5 h-5 text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur-md transition-all duration-300 group-hover:border-brand-green group-hover:bg-brand-green">
+                            <ExternalLink className="h-5 w-5 text-white transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#03100E]" />
                         </div>
                     </div>
                 </div>

@@ -8,7 +8,7 @@ const Experience = async () => {
     const experiences = await getExperienceData();
 
     return (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col">
             <ExperienceTitle />
 
             <div className="w-full">
@@ -23,9 +23,7 @@ export default Experience
 const getExperienceData = async () => {
 
     const results = await getExperiencesV2();
-    console.log(`experiences: ${JSON.stringify(results)}`);
     const experiences: ExperiencePathProps[] = []
-   //console.log(`experiences: ${JSON.stringify(results)}`);
     for (let i of results) {
         const activities: string[] = []
         if (i.inputs?.length > 0) {
@@ -34,15 +32,18 @@ const getExperienceData = async () => {
             }
         }
         experiences.push({
-            title: i.name,
+            title: i.company || i.name || '',
             position: i.title,
             cover: i.image,
+            company: i.company,
+            description: i.description,
+            location: i.location,
+            technologies: i.technologies,
             activities,
             startDate: i.start,
             endDate: i.end
         })
     }
 
-    //console.log(`experiencesRESULT: ${JSON.stringify(experiences)}`);
     return experiences;
 }

@@ -13,11 +13,6 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'api.bearcodev.com',
-        pathname: '**',
-      },
-      {
-        protocol: 'https',
         hostname: 'images.unsplash.com',
         pathname: '**',
       },

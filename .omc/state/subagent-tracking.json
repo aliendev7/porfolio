@@ -1,0 +1,72 @@
+{
+  "agents": [
+    {
+      "agent_id": "a810ed9f117a9aaba",
+      "agent_type": "Explore",
+      "started_at": "2026-06-06T03:38:30.963Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-06-06T03:41:06.394Z",
+      "duration_ms": 155431
+    },
+    {
+      "agent_id": "aef0e2fc74d78263c",
+      "agent_type": "Explore",
+      "started_at": "2026-06-06T03:38:40.847Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-06-06T03:41:10.997Z",
+      "duration_ms": 150150
+    },
+    {
+      "agent_id": "a61616ba8fed84990",
+      "agent_type": "Explore",
+      "started_at": "2026-06-07T02:52:32.892Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-06-07T02:55:20.435Z",
+      "duration_ms": 167543
+    },
+    {
+      "agent_id": "a8d675348a6af6a6e",
+      "agent_type": "Explore",
+      "started_at": "2026-06-07T02:52:41.204Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-06-07T02:56:59.921Z",
+      "duration_ms": 258717
+    },
+    {
+      "agent_id": "ac517b9b5592b5865",
+      "agent_type": "oh-my-claudecode:executor",
+      "started_at": "2026-06-07T03:26:29.842Z",
+      "parent_mode": "none",
+      "status": "running"
+    },
+    {
+      "agent_id": "ab122522bcdf58ba7",
+      "agent_type": "oh-my-claudecode:executor",
+      "started_at": "2026-06-07T03:26:43.146Z",
+      "parent_mode": "none",
+      "status": "running"
+    },
+    {
+      "agent_id": "a469762d0a739407f",
+      "agent_type": "oh-my-claudecode:executor",
+      "started_at": "2026-06-07T03:26:56.292Z",
+      "parent_mode": "none",
+      "status": "running"
+    },
+    {
+      "agent_id": "a3ed93d6d6192f9e8",
+      "agent_type": "oh-my-claudecode:executor",
+      "started_at": "2026-06-07T03:27:08.506Z",
+      "parent_mode": "none",
+      "status": "running"
+    }
+  ],
+  "total_spawned": 8,
+  "total_completed": 36,
+  "total_failed": 0,
+  "last_updated": "2026-06-07T03:27:08.616Z"
+}

@@ -1,109 +1,183 @@
-
 "use client"
 import { useState } from "react";
-import { ExternalLink, Code2, X } from "lucide-react";
+import { ExternalLink, Code2, X, Github, Calendar, Folder } from "lucide-react";
 import { ProjectType } from "./types/types";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useLanguage } from "../providers/LanguageProvider";
+import { format } from "date-fns";
+import { es, enUS } from "date-fns/locale";
 
-const ProjectCard = ({ project }: { project: ProjectType }) => {
-    const [showTool, setShowTool] = useState(false)
-    const { t } = useLanguage();
+const ProjectCard = ({ project, index = 0 }: { project: ProjectType; index?: number }) => {
+    const [showTool, setShowTool] = useState(false);
+    const { lang, t } = useLanguage();
+    const reduce = useReducedMotion();
+
+    const cover = project.cover || project.coverImage || "";
+    const description = project.about || project.description || "";
+    const href = project.link || project.liveUrl || "#";
+    const isExternal = /^https?:\/\//.test(href);
+    const allTechs = [
+        ...((project.tools || []).map((tool) => tool?.name) ?? []),
+        ...(project.technologies || []),
+    ].filter(Boolean);
+
+    const publishDate = project.publishedAt
+        ? format(new Date(project.publishedAt), 'MMM yyyy', { locale: lang === 'es' ? es : enUS })
+        : null;
 
     return (
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="group relative w-full h-[500px] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300"
+        <motion.article
+            initial={reduce ? false : { opacity: 0, y: 28 }}
+            whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: index * 0.08, ease: [0.21, 0.6, 0.35, 1] }}
+            className="group relative overflow-hidden rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-500 hover:shadow-xl hover:shadow-brand-green/10 hover:border-brand-green/30 dark:border-white/10 dark:bg-white/5"
         >
-            {/* Background Image */}
-            <div className="absolute inset-0">
-                <Image 
-                    src={project.cover}
-                    alt={project.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"/>
-            </div>
+            {/* Cover Image */}
+            <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-white/5">
+                {cover && (
+                    <Image
+                        src={cover}
+                        alt={project.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                )}
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
 
-            {/* Content Container */}
-            <div className="relative h-full flex flex-col justify-between p-6 z-10">
-                
-                {/* Top Badge */}
-                <div className="flex justify-end">
-                    <button 
-                        onClick={() => setShowTool(!showTool)}
-                        className="group/btn bg-white/10 hover:bg-brand-green backdrop-blur-md text-white p-3 rounded-full transition-all duration-300 hover:scale-110"
+                {/* Top badges */}
+                <div className="absolute top-4 left-4 flex items-center gap-2">
+                    {project.category && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-green/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                            <Folder className="h-3 w-3" />
+                            {project.category}
+                        </span>
+                    )}
+                    {publishDate && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-black/40 px-3 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm">
+                            <Calendar className="h-3 w-3" />
+                            {publishDate}
+                        </span>
+                    )}
+                </div>
+
+                {/* Tech toggle button */}
+                {allTechs.length > 0 && (
+                    <button
+                        onClick={(e) => { e.preventDefault(); setShowTool(!showTool); }}
+                        aria-label={t.projects.technologies}
+                        className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white backdrop-blur-md transition-all duration-300 hover:border-brand-green hover:bg-brand-green hover:text-[#03100E]"
                     >
-                        <Code2 className="w-5 h-5" />
+                        <Code2 className="h-4 w-4" />
                     </button>
-                </div>
-
-                {/* Bottom Content */}
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <h3 className="text-2xl md:text-3xl font-bold text-white font-poiret">
-                            {project.title}
-                        </h3>
-                        <p className="text-gray-200 text-sm leading-relaxed line-clamp-2">
-                            {project.about}
-                        </p>
-                    </div>
-                    
-                    <a 
-                        href={project.link} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 bg-white/10 hover:bg-white backdrop-blur-md text-white hover:text-brand-green px-6 py-3 rounded-full transition-all duration-300 group/link"
-                    >
-                        <span className="text-sm font-medium">View Project</span>
-                        <ExternalLink className="w-4 h-4 group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
-                    </a>
-                </div>
+                )}
             </div>
 
-            {/* Tools Reveal Overlay */}
+            {/* Content */}
+            <div className="p-5 sm:p-6">
+                {/* Title + links */}
+                <div className="flex items-start justify-between gap-3 mb-3">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white font-poiret leading-tight group-hover:text-brand-green transition-colors duration-300">
+                        {project.title}
+                    </h3>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                        {project.githubUrl && (
+                            <a
+                                href={project.githubUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 transition-all duration-300 hover:border-brand-green hover:text-brand-green hover:bg-brand-green/10"
+                                aria-label="GitHub"
+                            >
+                                <Github className="h-4 w-4" />
+                            </a>
+                        )}
+                        {href !== "#" && (
+                            <a
+                                href={href}
+                                target={isExternal ? "_blank" : undefined}
+                                rel={isExternal ? "noreferrer" : undefined}
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 transition-all duration-300 hover:border-brand-green hover:text-brand-green hover:bg-brand-green/10"
+                                aria-label="Live demo"
+                            >
+                                <ExternalLink className="h-4 w-4" />
+                            </a>
+                        )}
+                    </div>
+                </div>
+
+                {/* Description */}
+                {description && (
+                    <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
+                        {description}
+                    </p>
+                )}
+
+                {/* Tech tags */}
+                {allTechs.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                        {allTechs.slice(0, 5).map((tech, i) => (
+                            <span
+                                key={i}
+                                className="inline-flex items-center rounded-full bg-gray-100 dark:bg-white/10 px-2.5 py-0.5 text-[10px] font-medium text-gray-600 dark:text-gray-300 border border-gray-200/50 dark:border-white/5"
+                            >
+                                {tech}
+                            </span>
+                        ))}
+                        {allTechs.length > 5 && (
+                            <span className="inline-flex items-center rounded-full bg-brand-green/10 px-2.5 py-0.5 text-[10px] font-bold text-brand-green">
+                                +{allTechs.length - 5}
+                            </span>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Tech overlay */}
             <AnimatePresence>
                 {showTool && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: "100%" }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="absolute inset-0 bg-gradient-to-br from-brand-green to-brand-medium backdrop-blur-xl flex flex-col items-center justify-center p-8 z-20"
+                        className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-br from-brand-green to-brand-medium p-8 backdrop-blur-xl"
                     >
-                        <button 
+                        <button
                             onClick={() => setShowTool(false)}
-                            className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
+                            aria-label="Close"
+                            className="absolute right-4 top-4 rounded-full p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                         >
-                            <X className="w-6 h-6" />
+                            <X className="h-5 w-5" />
                         </button>
-                        
-                        <h4 className="text-2xl font-poiret font-bold text-white mb-6">
+
+                        <h4 className="mb-6 font-poiret text-2xl font-bold text-white">
                             {t.projects.technologies}
                         </h4>
-                        
-                        <div className="flex flex-wrap justify-center gap-3 max-w-md">
-                            {project.tools.map((item, i) => (
+
+                        <div className="flex max-w-md flex-wrap justify-center gap-2.5">
+                            {allTechs.map((tech, i) => (
                                 <motion.span
                                     key={i}
                                     initial={{ opacity: 0, scale: 0.8 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: i * 0.05 }}
-                                    className="px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-white text-sm font-medium hover:bg-white/30 transition-colors"
+                                    transition={{ delay: reduce ? 0 : i * 0.04 }}
+                                    className="rounded-full border border-white/30 bg-white/15 px-4 py-2 font-mono text-xs uppercase tracking-wide text-white backdrop-blur-sm"
                                 >
-                                    {item.name}
+                                    {tech}
                                 </motion.span>
                             ))}
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.div>
-    )
-}
+        </motion.article>
+    );
+};
 
 export default ProjectCard;

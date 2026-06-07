@@ -21,6 +21,10 @@ export interface ExperienceType {
     image: string;
     title: string;
     name: string;
+    company?: string;
+    description?: string;
+    location?: string;
+    technologies?: string[];
     start: string;
     end: string;
 }
@@ -106,6 +110,19 @@ export type ResourceType = {
     author: string;
     publishedAt: Date;
     readTimeMinutes?: number;
+    createdAt: Date;
+    updatedAt: Date;
+};
+
+export type EducationType = {
+    id: string;
+    institution: string;
+    degree: string;
+    field: string;
+    slug: string;
+    startDate: Date;
+    endDate?: Date;
+    order: number;
     createdAt: Date;
     updatedAt: Date;
 };

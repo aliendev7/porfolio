@@ -3,8 +3,8 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Input } from "../../../@/components/ui/input";
-import { Button } from "../../../@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,7 +12,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../@/components/ui/form";
+} from "@/components/ui/form";
 import { z } from "zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SkillCategoryType } from "../../components/types/types";
@@ -34,7 +34,7 @@ const skillFormDataSchema = z.object({
 export type SkillFormData = z.infer<typeof skillFormDataSchema>;
 
 const fetchSkillCategories = async (): Promise<SkillCategoryType[] | []> => {
-  const data = await fetchJSON<SkillCategoryType[]>(`${process.env.NEXT_PUBLIC_API_URL}/api/skill-categories`);
+  const data = await fetchJSON<SkillCategoryType[]>("/api/skill-categories");
   return data ?? [];
 };
 
@@ -85,7 +85,7 @@ const SkillForm = forwardRef<
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
+      <form id="datatable-form" onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
         <FormField
           control={control}
           name="name"

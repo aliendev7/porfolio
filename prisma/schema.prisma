@@ -159,3 +159,16 @@ model Skill {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }
+
+model Education {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  institution String
+  degree      String
+  field       String
+  slug        String    @unique
+  startDate   DateTime
+  endDate     DateTime?
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}

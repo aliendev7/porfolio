@@ -4,142 +4,123 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Next.js 14 portfolio application featuring server-side rendering, multilingual support (English/Spanish), and a content management dashboard. The application uses MongoDB with Prisma ORM for data persistence and includes sections for projects, blogs, experiences, and resources.
+Next.js 14 (App Router) portfolio site with server-rendered public pages, a content-management UI, multilingual content (English/Spanish), and a MongoDB-backed Prisma data layer. Surfaces: Home, About, Experience, Projects, Blogs, Resources, Skills — plus an authoring UI for each.
 
 ## Development Commands
 
 ```bash
-# Development server
-npm run dev
+npm run dev                 # Next dev server (default: http://localhost:3000)
+npm run build               # Production build
+npm start                   # Run the built app
+npm run lint                # next lint (eslint-config-next)
 
-# Production build
-npm run build
-
-# Start production server
-npm start
-
-# Linting
-npm run lint
-
-# Database operations
-npx prisma generate         # Generate Prisma client
-npx prisma db push          # Push schema changes to MongoDB
-npx prisma db seed          # Seed database with initial data
-npx prisma studio           # Open Prisma Studio GUI
+npx prisma generate         # Regenerate Prisma client
+npx prisma db push          # Sync schema.prisma to MongoDB (no migrations — Mongo provider)
+npx prisma db seed          # Run prisma/seed.ts (ts-node) — seeds resource categories + sample resources
+npx prisma studio           # Prisma GUI
 ```
+
+No test runner is configured — there are no Jest/Vitest/Playwright scripts in `package.json`. Don't claim tests pass when verifying changes; rely on `lint` and a manual run via `npm run dev`.
+
+Node.js >= 24.0.0 is required (`package.json` engines).
+
+## Environment Variables
+
+Defined in `.env.example`:
+
+- `DATABASE_URL` — MongoDB connection string (required by Prisma)
+- `NEXT_PUBLIC_API_URL` — Base URL used by `lib/request-util.ts#fetchJSON` to absolutize relative `/api/*` paths (defaults to `http://localhost:3000`). It is **public** (prefixed `NEXT_PUBLIC_`), so server and client code share the same value.
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` — used by `next-cloudinary` for direct uploads from the authoring UI.
+
+There is no `API_URL` (non-public) variable — earlier docs that referenced one are wrong.
 
 ## Architecture Overview
 
-### Application Structure
+### Two Authoring UIs Coexist — Prefer `/admin/*`
 
-- **App Router (Next.js 14)**: Uses the `app/` directory structure with server-side rendering by default
-- **Public Routes**: Home, About, Experience, Projects, Blogs, Resources (multilingual)
-- **Dashboard Routes**: Content management interface at `/dashboard/*` for CRUD operations
-- **API Routes**: REST endpoints in `app/api/*` following Next.js Route Handler pattern
+There are **two parallel content-management surfaces** in the repo:
 
-### Data Layer
+- `app/admin/*` — the newer, actively-developed UI. Uses shadcn-style primitives imported from `@/components/ui/*` (Card, Badge, etc.), `AdminSidebar` + `AdminHeader` layout, TanStack Query for fetching, and form components in `app/admin/components/*Form.tsx`. The admin dashboard at `app/admin/page.tsx` is the entry point.
+- `app/dashboard/*` — the older surface using components from `@/app/components/ui/*` and `@/app/components/dashboard/*` (CRUDTable, DataGrid, AG Grid, the `DashBoardSidebar`).
 
-**Database**: MongoDB with Prisma ORM (schema at `prisma/schema.prisma`)
+When adding a new content type, mirror the `/admin` pattern unless you have a reason to extend the older dashboard. **Do not unify them implicitly** — the two systems use different component libraries and layout conventions, and the user has not asked for consolidation.
 
-**Key Models**:
-- `UserDetail` - Portfolio owner's main information (welcome text, CV, image)
-- `UserSocialLink` - Social media links
-- `AboutContent` - About section paragraphs
-- `Experience` with nested `ExperienceInput` - Work history with bullet points
-- `Project` with many-to-many `ProjectTool` - Portfolio projects
-- `Blog` - Blog posts
-- `Resource` with `ResourceCategory` - Learning resources organized by category
-- `SkillCategory` with `Skill` - Technical skills grouped by category
+### Data Flow
 
-**Data Access Pattern**:
-- Server components fetch data directly via `app/requests/requests.ts` using `fetchJSON` utility
-- API routes use the singleton Prisma client from `lib/db.ts`
-- Client-side mutations use TanStack Query (React Query)
+```
+Server Component page  ──►  app/requests/requests.ts   (getXxxV2 helpers)
+                                  │
+                                  ▼
+                       lib/request-util.ts#fetchJSON   (cache: 'no-store')
+                                  │
+                                  ▼  HTTP /api/*
+                       app/api/<resource>/route.ts     (NextRequest/NextResponse)
+                                  │
+                                  ▼
+                            lib/db.ts (Prisma singleton)
+                                  │
+                                  ▼
+                                MongoDB
+```
 
-### Internationalization (i18n)
+Public pages fetch through `app/requests/requests.ts` (named `getXxxV2`) so they re-hit the API rather than calling Prisma directly. `fetchJSON` always sets `cache: 'no-store'` — every page-load roundtrips to the API. Client-side mutations go through TanStack Query (`@tanstack/react-query`) configured in `app/providers/tanstack.provider.tsx`.
 
-**Language System**: Custom implementation (not using next-intl)
-- Two locales: `'en'` (English) and `'es'` (Spanish)
-- Dictionary defined in `app/lib/dictionary.ts`
-- Language detection: Cookie (`NEXT_LOCALE`) → Accept-Language header → Default to 'en'
-- `LanguageProvider` context provides `{ lang, setLang, t }` throughout the app
-- Language switcher component allows runtime language changes
+**Prisma client singleton** (`lib/db.ts`): exported as default `db`. Always import from `lib/db.ts` rather than instantiating `new PrismaClient()` — the singleton pattern under `globalThis.prisma` prevents connection-pool exhaustion in dev with hot reload.
 
-### Theming
+### Provider Nesting (`app/layout.tsx`)
 
-**Dark Mode**: Custom implementation using localStorage and CSS classes
-- Theme initialized via inline script in `app/layout.tsx` to prevent flash
-- `ThemeProvider` manages theme state via React context
-- Respects system preference if no theme is explicitly set
-- Uses Tailwind's `dark:` variant for styling
+```
+ThemeProvider → TanstackProvider → LanguageProvider → ClientLayout → MainLayout → children
+```
+
+Locale is resolved server-side in `app/layout.tsx`: cookie `NEXT_LOCALE` → `accept-language` header → `'en'` default, then passed as `initialLang` to `LanguageProvider`. Theme is applied via an inline blocking `<script>` in `<head>` to avoid FOUC; `ThemeProvider` then takes over.
+
+### Internationalization
+
+Custom (not `next-intl`). Two locales: `'en'` | `'es'`. Strings live in `app/lib/dictionary.ts`. The hook is `useLanguage()` and exposes `{ lang, t, changeLanguage }` — note `changeLanguage` (writes cookie + `router.refresh()`), not `setLang`. To add a key, extend both `en` and `es` branches of `dictionary` together; the `t` object is typed off the `en` shape.
+
+### Slug Generation — Two Implementations
+
+A shared helper exists in `lib/slug-util.ts`, but **most API routes redefine `generateSlug()` inline** (e.g. `app/api/resources/route.ts`). The two regexes differ — the inline version is the de-facto correct one (`/[^\w\s-]/g`, `/[\s_-]+/g`); the `lib/slug-util.ts` version has double-escaped `\\s` and is buggy. When adding a new slugged resource, copy the inline version rather than importing from `lib/slug-util.ts`, or fix `lib/slug-util.ts` first.
+
+API routes that create slugged records (`Resource`, `ResourceCategory`, `Project`, `Experience`, `Skill`, `SkillCategory`) must check for slug collisions on `POST` and return `409` — see `app/api/resources/route.ts` for the canonical pattern.
+
+### Prisma Schema Quirks
+
+- MongoDB provider — `db push` only (no SQL migrations).
+- `Project` ↔ `ProjectTool` is a many-to-many via shared `String[] @db.ObjectId` arrays (`toolIDs` / `projectIDs`) — Mongo-style, not a join table.
+- Several legacy fields are still on the models (`Project.about`, `Project.cover`, `Project.link`, `Experience.name`) — leave them alone unless explicitly cleaning up; production data may still reference them.
 
 ### Styling
 
-**CSS Framework**: Tailwind CSS with custom configuration
-- Custom fonts: Poiret One (headings) and Open Sans (body text) from Google Fonts
-- Component library: Radix UI primitives for accessible UI components
-- Animations: Framer Motion for page transitions and interactive elements
-- Remote images allowed from Cloudinary and `api.bearcodev.com` (see `next.config.js`)
+Tailwind CSS + custom configuration. Fonts loaded via `next/font/google`: `Poiret_One` (headings, `--font-poiret`) and `Open_Sans` (body, `--font-open-sans`). Dark mode is the Tailwind `dark:` class strategy, toggled by `ThemeProvider` against `localStorage['theme']`. Animations use Framer Motion. Allowed remote image hosts (`next.config.js`): `res.cloudinary.com`, `api.bearcodev.com`, `images.unsplash.com` — add to `remotePatterns` before using any new domain in `<Image>`.
 
-### Key Architectural Patterns
+### TypeScript
 
-**Provider Nesting** (in `app/layout.tsx`):
-```
-TanstackProvider → LanguageProvider → ClientLayout → MainLayout → children
-```
+- `strict: true`. Path alias `@/*` → repo root (`tsconfig.json`).
+- Shared types live in `app/components/types/types.ts` — update this when API responses or models change.
+- `tsconfig.json` excludes `scripts/`, so anything you put there is not type-checked.
 
-**Client/Server Boundary**:
-- Pages are Server Components by default
-- Data fetching happens on the server via `app/requests/requests.ts`
-- Client components marked with `'use client'` directive (providers, interactive components)
-- Dashboard uses client-side state management with TanStack Query for mutations
+## Workflow Notes
 
-**API Route Pattern**:
-- Each route exports `GET`, `POST`, `PUT`, `DELETE` handlers as needed
-- Dynamic routes use `[param]` folder structure (e.g., `app/api/resources/[slug]/route.ts`)
-- Slug generation for Resources and ResourceCategories using `generateSlug()` helper
-- Error responses include descriptive messages and appropriate HTTP status codes
+**Adding or changing a Prisma model:**
+1. Edit `prisma/schema.prisma`.
+2. `npx prisma db push` (MongoDB — no migration file is generated).
+3. `npx prisma generate`.
+4. Update `app/components/types/types.ts` to match.
+5. If the model needs seed data, update `prisma/seed.ts` (ts-node) before running `npx prisma db seed`.
 
-### Dashboard Architecture
+**Adding a new content resource end-to-end** — follow the existing slice (e.g. Resources):
+1. Model in `prisma/schema.prisma` (add `slug @unique` if user-facing).
+2. `app/api/<name>/route.ts` (GET, POST) and `app/api/<name>/[slug]/route.ts` (GET, PUT, DELETE).
+3. Type in `app/components/types/types.ts`.
+4. Reader in `app/requests/requests.ts` as `getXxxV2`.
+5. Public page in `app/<name>/page.tsx` (Server Component).
+6. Admin page in `app/admin/<name>/page.tsx` + `app/admin/components/<Name>Form.tsx`.
+7. Add a sidebar link in `app/admin/components/AdminSidebar.tsx`.
 
-Located at `/dashboard/*` with dedicated layout (`app/dashboard/layout.tsx`)
-- Grid layout with sidebar navigation (`DashBoardSidebar`)
-- Reusable CRUD components: `CRUDTable`, `DataGrid`, `Modal`, `DeleteModal`
-- Form components with react-hook-form and Zod validation
-- Date handling with `DatePicker`, `DatePickerField`, `DatePickerWithPopover` components
-- AG Grid for advanced data tables
-
-## Important Implementation Notes
-
-**Node Version**: Requires Node.js >= 24.0.0 (see `package.json` engines)
-
-**Environment Variables**:
-- `DATABASE_URL` - MongoDB connection string (required)
-- `API_URL` - API base URL for server-side fetches (defaults to http://localhost:3000)
-
-**Slug Generation**: Resources and ResourceCategories auto-generate slugs from titles. Ensure uniqueness checks are in place when creating new entries.
-
-**Image Handling**:
-- Uses Next.js Image component with remote patterns configured
-- Images stored as URLs (Cloudinary or API server paths)
-- Cover images required for Projects, Blogs, and Resources
-
-**TypeScript**:
-- Strict mode enabled
-- Type definitions in `app/components/types/types.ts`
-- All API responses and data models should be properly typed
-
-**Prisma Workflow**:
-1. Modify `prisma/schema.prisma`
-2. Run `npx prisma db push` to sync with MongoDB
-3. Run `npx prisma generate` to update the Prisma client
-4. Update TypeScript types in `types.ts` if needed
-5. Update seed file if adding new required models
-
-**Database Seeding**:
-- Seed file: `prisma/seed.ts`
-- Run: `npx prisma db seed`
-- Current seed includes:
-  - 7 Resource Categories (Frontend, Backend, DevOps, AI/ML, Mobile, Design, Career)
-  - 19 Sample Resources with real-world examples
-  - All resources have realistic content, cover images (Unsplash), tags, and metadata
+**API response conventions** (see `app/api/resources/route.ts`):
+- Validate required fields → `400` with `{ message }`.
+- Slug-collision check before create → `409 { message }`.
+- Caught errors → `500 { error, message }` and `console.error` the cause.
+- Success on create → `201` with the created object.

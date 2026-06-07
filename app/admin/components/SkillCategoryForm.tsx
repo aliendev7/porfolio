@@ -3,8 +3,8 @@
 import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Input } from "../../../@/components/ui/input";
-import { Button } from "../../../@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,9 +13,9 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from "../../../@/components/ui/form";
+} from "@/components/ui/form";
 import { z } from "zod";
-import { Textarea } from "../../../@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 
 type SkillCategoryFormProps = {
   initialData?: Partial<SkillCategoryFormData>;
@@ -72,7 +72,7 @@ const SkillCategoryForm = forwardRef<
 
   return (
     <Form {...form}>
-      <form id="formComponent" onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
+      <form id="datatable-form" onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
         <FormField
           control={control}
           name="name"

@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
+import React, { forwardRef, useEffect, useImperativeHandle } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,76 +12,51 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { ResourceCategoryType } from '../../components/types/types';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { ResourceCategoryType } from "../../components/types/types";
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: 'Name must be at least 2 characters.',
+    message: "Name must be at least 2 characters.",
   }),
 });
 
+type CategoryFormData = z.infer<typeof formSchema>;
+
 type CategoryFormProps = {
-  initialData?: ResourceCategoryType;
-  onSuccess: () => void;
+  initialData?: Partial<ResourceCategoryType>;
+  onSubmit: (data: CategoryFormData) => void;
 };
 
-const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, onSuccess }) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+const CategoryForm = forwardRef<
+  { submitForm: () => Promise<void> },
+  CategoryFormProps
+>(({ initialData, onSubmit }, ref) => {
+  const form = useForm<CategoryFormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      name: '',
+    defaultValues: {
+      name: initialData?.name || "",
     },
   });
 
+  const { handleSubmit, control, reset, formState: { isSubmitting } } = form;
+
+  useImperativeHandle(ref, () => ({
+    submitForm: handleSubmit(onSubmit),
+  }));
+
   useEffect(() => {
     if (initialData) {
-      form.reset(initialData);
+      reset({ name: initialData.name || "" });
     }
-  }, [initialData, form]);
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      let response;
-      if (initialData) {
-        // Update existing category
-        response = await fetch(`/api/categories/${initialData.slug}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
-      } else {
-        // Create new category
-        response = await fetch('/api/categories', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save category');
-      }
-
-      onSuccess();
-      form.reset();
-    } catch (error) {
-      console.error('Error saving category:', error);
-      alert(error instanceof Error ? error.message : 'An unknown error occurred');
-    }
-  };
+  }, [initialData, reset]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form id="datatable-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <FormField
-          control={form.control}
+          control={control}
           name="name"
           render={({ field }) => (
             <FormItem>
@@ -93,10 +68,13 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, onSuccess }) =
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {initialData?.id ? "Update Category" : "Create Category"}
+        </Button>
       </form>
     </Form>
   );
-};
+});
 
+CategoryForm.displayName = "CategoryForm";
 export default CategoryForm;

@@ -4,7 +4,8 @@ import { ResourceCard } from '../components/ResourceCard';
 import { ResourceType, ResourceCategoryType } from '../components/types/types';
 import { useLanguage } from '../providers/LanguageProvider';
 import { motion } from 'framer-motion';
-import { Filter, BookOpen, Sparkles } from 'lucide-react';
+import { Filter, BookOpen } from 'lucide-react';
+import { PageHeader } from '../components/PageHeader';
 
 interface ResourcesContentProps {
     initialResources: ResourceType[];
@@ -27,47 +28,36 @@ const ResourcesContent: React.FC<ResourcesContentProps> = ({ initialResources, c
     }, [initialResources, selectedCategory, selectedType]);
 
     return (
-        <div className="flex flex-col items-center w-full px-4 py-8">
+        <div className="flex flex-col w-full py-8">
             {/* Header Section */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center mb-12 w-full max-w-4xl"
-            >
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green/10 rounded-full mb-4">
-                    <Sparkles className="w-4 h-4 text-brand-green" />
-                    <span className="text-sm font-medium text-brand-green">Learning Hub</span>
-                </div>
-                <h1 className="text-5xl md:text-6xl font-bold mb-6 font-poiret bg-gradient-to-r from-brand-green to-brand-medium bg-clip-text text-transparent">
-                    {t.resources.title}
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
-                    {t.resources.description}
-                </p>
-            </motion.div>
+            <PageHeader
+                index="01"
+                title={t.resources.title}
+                subtitle={t.resources.description}
+            />
 
             {/* Filters Section */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-8 w-full max-w-5xl border border-gray-200 dark:border-gray-700"
+                className="mb-10 w-full rounded-3xl border border-gray-200/70 bg-white/60 p-6 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-white/5"
             >
-                <div className="flex items-center gap-2 mb-4">
-                    <Filter className="w-5 h-5 text-brand-green" />
-                    <h3 className="text-lg font-semibold">Filter Resources</h3>
+                <div className="mb-5 flex items-center gap-2.5">
+                    <Filter className="h-4 w-4 text-brand-green" />
+                    <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-brand-medium dark:text-brand-green">Filter Resources</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Category Filter */}
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                        <label className="mb-2 block font-mono text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
                             {t.resources.filterByCategory}
                         </label>
                         <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-brand-green focus:border-brand-green transition-all"
+                            className="w-full rounded-xl border border-gray-200/70 bg-white/70 px-4 py-3 text-gray-800 transition-all focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green dark:border-white/10 dark:bg-white/5 dark:text-gray-100"
                         >
                             <option value="all">{t.resources.allCategories}</option>
                             {categories.map((category) => (
@@ -80,13 +70,13 @@ const ResourcesContent: React.FC<ResourcesContentProps> = ({ initialResources, c
 
                     {/* Type Filter */}
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                        <label className="mb-2 block font-mono text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
                             {t.resources.filterByType}
                         </label>
                         <select
                             value={selectedType}
                             onChange={(e) => setSelectedType(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-brand-green focus:border-brand-green transition-all"
+                            className="w-full rounded-xl border border-gray-200/70 bg-white/70 px-4 py-3 text-gray-800 transition-all focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green dark:border-white/10 dark:bg-white/5 dark:text-gray-100"
                         >
                             <option value="all">{t.resources.allTypes}</option>
                             {resourceTypes.map((type) => (
@@ -99,10 +89,10 @@ const ResourcesContent: React.FC<ResourcesContentProps> = ({ initialResources, c
                 </div>
 
                 {/* Results Count */}
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <BookOpen className="w-4 h-4" />
-                        <span className="font-medium">
+                <div className="mt-5 border-t border-gray-200/70 pt-4 dark:border-white/10">
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-500 dark:text-gray-400">
+                        <BookOpen className="h-4 w-4 text-brand-green" />
+                        <span>
                             {filteredResources.length} {filteredResources.length === 1 ? 'resource' : 'resources'} found
                         </span>
                     </div>
@@ -115,7 +105,7 @@ const ResourcesContent: React.FC<ResourcesContentProps> = ({ initialResources, c
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
                 >
                     {filteredResources.map((resource, i) => (
                         <motion.div
@@ -132,12 +122,12 @@ const ResourcesContent: React.FC<ResourcesContentProps> = ({ initialResources, c
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 text-center max-w-md border border-gray-200 dark:border-gray-700"
+                    className="mx-auto max-w-md rounded-3xl border border-gray-200/70 bg-white/60 p-12 text-center shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-white/5"
                 >
-                    <div className="bg-gray-100 dark:bg-gray-700 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                        <BookOpen className="w-10 h-10 text-gray-400" />
+                    <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-brand-green/10">
+                        <BookOpen className="h-9 w-9 text-brand-green" />
                     </div>
-                    <h3 className="text-xl font-semibold mb-2">No resources found</h3>
+                    <h3 className="mb-2 font-poiret text-2xl font-bold text-gray-900 dark:text-white">No resources found</h3>
                     <p className="text-gray-600 dark:text-gray-400">
                         Try adjusting your filters to find more resources
                     </p>

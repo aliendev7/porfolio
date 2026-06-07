@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useLanguage } from "../providers/LanguageProvider";
 import { Github, Linkedin, Mail } from "lucide-react";
+import { LogoMark } from "./LogoMark";
 
 export const Footer = () => {
   const { t } = useLanguage();
@@ -14,11 +15,11 @@ export const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex gap-2 items-center">
-              <div className="flex justify-center items-center w-8 h-8 bg-gradient-to-br rounded-lg from-brand-green to-brand-medium">
-                <span className="text-sm font-bold text-white">B</span>
+              <div className="flex justify-center items-center w-8 h-8 bg-gradient-to-br rounded-lg shadow-sm shadow-brand-green/30 from-brand-green to-brand-medium">
+                <LogoMark className="w-[18px] h-[18px] text-white" />
               </div>
               <span className="text-lg font-bold text-gray-900 font-poiret dark:text-white">
-                Bear<span className="text-brand-green">Code</span>
+                dran<span className="text-brand-green">zr</span>
               </span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -86,7 +87,7 @@ export const Footer = () => {
         <div className="pt-8 border-t border-gray-200/50 dark:border-gray-800/50">
           <div className="flex flex-col gap-4 justify-between items-center md:flex-row">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              © {currentYear} BearCode. All rights reserved.
+              © {currentYear} dranzr. All rights reserved.
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Made with <span className="text-red-500">♥</span> using Next.js

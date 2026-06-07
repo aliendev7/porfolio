@@ -79,14 +79,50 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        "marquee-reverse": {
+          from: { transform: "translateX(-50%)" },
+          to: { transform: "translateX(0)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.55", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.06)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-14px)" },
+        },
+        "drift-slow": {
+          "0%, 100%": { transform: "translate3d(0,0,0)" },
+          "50%": { transform: "translate3d(-2.5%,1.5%,0)" },
+        },
+        aurora: {
+          from: { transform: "translate(-50%, -50%) rotate(0deg)" },
+          to: { transform: "translate(-50%, -50%) rotate(360deg)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "200% center" },
+          "100%": { backgroundPosition: "-200% center" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        marquee: "marquee 38s linear infinite",
+        "marquee-reverse": "marquee-reverse 38s linear infinite",
+        "glow-pulse": "glow-pulse 5s ease-in-out infinite",
+        float: "float 7s ease-in-out infinite",
+        "drift-slow": "drift-slow 24s ease-in-out infinite",
+        aurora: "aurora 28s linear infinite",
+        shimmer: "shimmer 7s linear infinite",
       },
       fontFamily: {
         poiret: ['var(--font-poiret)'],
         sans: ['var(--font-open-sans)'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
     },
   },

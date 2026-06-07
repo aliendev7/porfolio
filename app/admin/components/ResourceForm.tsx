@@ -3,8 +3,8 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Input } from "../../../@/components/ui/input";
-import { Button } from "../../../@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,11 +12,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../@/components/ui/form";
+} from "@/components/ui/form";
 import { z } from "zod";
 import { ResourceCategoryType, ResourceType } from "../../components/types/types";
 import { fetchJSON } from "../../../lib/request-util";
-import { Textarea } from "../../../@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 import CustomDatePicker from "@/app/components/dashboard/DatePicker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ImageUpload from "@/app/components/ui/image-upload";
@@ -48,7 +48,7 @@ export type ResourceFormRef = {
 };
 
 const fetchResourceCategories = async (): Promise<ResourceCategoryType[] | []> => {
-    const data = await fetchJSON<ResourceCategoryType[]>(`${process.env.NEXT_PUBLIC_API_URL}/api/resource-categories`) as any;
+    const data = await fetchJSON<ResourceCategoryType[]>("/api/resource-categories") as any;
     return data ?? [];
 };
 
@@ -109,7 +109,7 @@ const ResourceForm = forwardRef<
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
+      <form id="datatable-form" onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
         <FormField
           control={control}
           name="title"

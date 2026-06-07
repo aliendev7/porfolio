@@ -6,6 +6,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useLanguage } from "../providers/LanguageProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import { ThemeToggle } from "./ThemeToggle";
+import { LogoMark } from "./LogoMark";
 
 type HeaderProps = { active: string; isDark?: boolean };
 
@@ -156,13 +157,13 @@ const Header: React.FC<HeaderProps> = ({ active, isDark }) => {
 export default Header
 
 export const Logo = ({ compact }: { compact?: boolean }) => (
-    <Link href="/" className="flex gap-2 items-center">
-        <div className="flex justify-center items-center w-9 h-9 bg-gradient-to-br rounded-xl shadow-md from-brand-green to-brand-medium">
-            <span className="text-lg font-bold text-foreground dark:text-white">B</span>
+    <Link href="/" className="flex gap-2 items-center group focus-ring rounded-xl">
+        <div className="flex justify-center items-center w-9 h-9 bg-gradient-to-br rounded-xl shadow-md shadow-brand-green/30 from-brand-green to-brand-medium transition-transform duration-300 group-hover:scale-105">
+            <LogoMark className="w-5 h-5 text-white" />
         </div>
         {!compact && (
             <div className="text-lg font-bold tracking-wide text-foreground dark:text-white font-poiret">
-                Bear<span className="text-brand-green">Code</span>
+                dran<span className="text-brand-green">zr</span>
             </div>
         )}
     </Link>

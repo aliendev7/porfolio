@@ -1,0 +1,506 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1780714256816,
+  "projectRoot": "d:\\spiritbear\\PROYECTS\\FRONT\\NEXTJS\\portfolio_frontend",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": ">=24.0.0",
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "14.1.0",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "18.2.0",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "18.2.0",
+        "category": "frontend"
+      }
+    ],
+    "packageManager": "pnpm",
+    "runtime": "Node.js 24.0.0"
+  },
+  "build": {
+    "buildCommand": "pnpm build",
+    "testCommand": null,
+    "lintCommand": "pnpm lint",
+    "devCommand": "pnpm dev",
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "lint": "next lint"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "app",
+      "components",
+      "lib",
+      "public",
+      "scripts"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "@": {
+      "path": "@",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1780714256694,
+      "keyFiles": []
+    },
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 4,
+      "lastAccessed": 1780714256696,
+      "keyFiles": [
+        "favicon.ico",
+        "globals.css",
+        "layout.tsx",
+        "page.tsx"
+      ]
+    },
+    "components": {
+      "path": "components",
+      "purpose": "UI components",
+      "fileCount": 0,
+      "lastAccessed": 1780714256742,
+      "keyFiles": []
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 6,
+      "lastAccessed": 1780714256745,
+      "keyFiles": [
+        "date-utils.ts",
+        "db.ts",
+        "prisma-seed.ts",
+        "request-util.ts",
+        "slug-util.ts"
+      ]
+    },
+    "prisma": {
+      "path": "prisma",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1780714256746,
+      "keyFiles": [
+        "schema.prisma",
+        "seed.ts"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 3,
+      "lastAccessed": 1780714256747,
+      "keyFiles": [
+        "bear-head.svg",
+        "favicon.ico",
+        "optimization-test.js"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 1,
+      "lastAccessed": 1780714256748,
+      "keyFiles": [
+        "update-experiences.ts"
+      ]
+    },
+    "styles": {
+      "path": "styles",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1780714256749,
+      "keyFiles": [
+        "exp.scss",
+        "main.scss",
+        "mixins.scss",
+        "style.scss"
+      ]
+    },
+    "@\\components": {
+      "path": "@\\components",
+      "purpose": "UI components",
+      "fileCount": 0,
+      "lastAccessed": 1780714256751,
+      "keyFiles": []
+    },
+    "@\\lib": {
+      "path": "@\\lib",
+      "purpose": "Library code",
+      "fileCount": 1,
+      "lastAccessed": 1780714256753,
+      "keyFiles": [
+        "utils.ts"
+      ]
+    },
+    "app\\api": {
+      "path": "app\\api",
+      "purpose": "API routes",
+      "fileCount": 1,
+      "lastAccessed": 1780714256757,
+      "keyFiles": [
+        "middleware.ts"
+      ]
+    },
+    "app\\components": {
+      "path": "app\\components",
+      "purpose": "UI components",
+      "fileCount": 22,
+      "lastAccessed": 1780714256758,
+      "keyFiles": [
+        "AboutBody.tsx",
+        "backgroundSpline.tsx",
+        "BlogCard.tsx"
+      ]
+    },
+    "prisma\\scripts": {
+      "path": "prisma\\scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 1,
+      "lastAccessed": 1780714256761,
+      "keyFiles": [
+        "populate-experience-slugs.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "",
+      "accessCount": 31,
+      "lastAccessed": 1780801348993,
+      "type": "directory"
+    },
+    {
+      "path": "app\\components\\BodyContent.tsx",
+      "accessCount": 14,
+      "lastAccessed": 1780719935275,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\FeaturedProjects.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1780719952099,
+      "type": "file"
+    },
+    {
+      "path": "app\\globals.css",
+      "accessCount": 8,
+      "lastAccessed": 1780719881460,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\home\\ContactCTA.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1780719966747,
+      "type": "file"
+    },
+    {
+      "path": "app\\layout.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1780720349167,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\header.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1780721054095,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\home\\AboutTeaser.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1780719426431,
+      "type": "file"
+    },
+    {
+      "path": "tailwind.config.js",
+      "accessCount": 6,
+      "lastAccessed": 1780719865441,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\Footer.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1780721066664,
+      "type": "file"
+    },
+    {
+      "path": "app\\page.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1780799558899,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\MainLayout.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1780800324368,
+      "type": "file"
+    },
+    {
+      "path": "app",
+      "accessCount": 6,
+      "lastAccessed": 1780800358489,
+      "type": "directory"
+    },
+    {
+      "path": "lib\\slug-util.ts",
+      "accessCount": 5,
+      "lastAccessed": 1780802796088,
+      "type": "file"
+    },
+    {
+      "path": "app\\lib\\dictionary.ts",
+      "accessCount": 4,
+      "lastAccessed": 1780717795974,
+      "type": "file"
+    },
+    {
+      "path": "next.config.js",
+      "accessCount": 4,
+      "lastAccessed": 1780720362928,
+      "type": "file"
+    },
+    {
+      "path": "app\\requests\\requests.ts",
+      "accessCount": 4,
+      "lastAccessed": 1780800780144,
+      "type": "file"
+    },
+    {
+      "path": "lib\\db.ts",
+      "accessCount": 4,
+      "lastAccessed": 1780800882178,
+      "type": "file"
+    },
+    {
+      "path": "app\\api\\resources\\route.ts",
+      "accessCount": 4,
+      "lastAccessed": 1780801044789,
+      "type": "file"
+    },
+    {
+      "path": "app\\api\\projects\\route.ts",
+      "accessCount": 4,
+      "lastAccessed": 1780801045608,
+      "type": "file"
+    },
+    {
+      "path": "prisma\\schema.prisma",
+      "accessCount": 4,
+      "lastAccessed": 1780801090326,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\home\\HeroAtmosphere.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780720357439,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\ProjectCard.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1780799829776,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\types\\types.ts",
+      "accessCount": 3,
+      "lastAccessed": 1780800780129,
+      "type": "file"
+    },
+    {
+      "path": "lib\\request-util.ts",
+      "accessCount": 3,
+      "lastAccessed": 1780801047763,
+      "type": "file"
+    },
+    {
+      "path": "C:\\Users\\spiritbear\\.claude\\plans\\velvety-drifting-parrot.md",
+      "accessCount": 3,
+      "lastAccessed": 1780801417473,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "accessCount": 2,
+      "lastAccessed": 1780714413036,
+      "type": "file"
+    },
+    {
+      "path": ".env",
+      "accessCount": 2,
+      "lastAccessed": 1780716870023,
+      "type": "file"
+    },
+    {
+      "path": "scripts\\repro-projects.mjs",
+      "accessCount": 2,
+      "lastAccessed": 1780716878052,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 2,
+      "lastAccessed": 1780717136600,
+      "type": "file"
+    },
+    {
+      "path": "app\\providers\\LanguageProvider.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780717165338,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\backgroundSpline.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780717301185,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\SocialLink.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780717800995,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\home\\TechMarquee.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1780719485397,
+      "type": "file"
+    },
+    {
+      "path": ".env.example",
+      "accessCount": 2,
+      "lastAccessed": 1780800780569,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 1,
+      "lastAccessed": 1780714309341,
+      "type": "file"
+    },
+    {
+      "path": "tsconfig.json",
+      "accessCount": 1,
+      "lastAccessed": 1780714312187,
+      "type": "file"
+    },
+    {
+      "path": "app\\admin\\layout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780714349163,
+      "type": "file"
+    },
+    {
+      "path": "app\\admin\\page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780714349679,
+      "type": "file"
+    },
+    {
+      "path": "app\\providers\\ThemeProvider.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780717150251,
+      "type": "file"
+    },
+    {
+      "path": "components\\ui\\button.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780717150845,
+      "type": "file"
+    },
+    {
+      "path": "components\\ui\\card.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780717150879,
+      "type": "file"
+    },
+    {
+      "path": "components\\ui\\badge.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780717151058,
+      "type": "file"
+    },
+    {
+      "path": "components\\ui\\input.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780717151137,
+      "type": "file"
+    },
+    {
+      "path": "components",
+      "accessCount": 1,
+      "lastAccessed": 1780717158851,
+      "type": "directory"
+    },
+    {
+      "path": "app\\components\\ExperienceTimeline.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780717162716,
+      "type": "file"
+    },
+    {
+      "path": "app\\components",
+      "accessCount": 1,
+      "lastAccessed": 1780717164374,
+      "type": "directory"
+    },
+    {
+      "path": "app\\components\\ui\\stats-card.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780717168127,
+      "type": "file"
+    },
+    {
+      "path": "app\\providers\\ClientLayout.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780717171313,
+      "type": "file"
+    },
+    {
+      "path": "app\\components\\LogoMark.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1780721029536,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

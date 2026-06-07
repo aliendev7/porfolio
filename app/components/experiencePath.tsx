@@ -4,6 +4,10 @@ export interface ExperiencePathProps {
     title: string
     position: string
     cover: string
+    company?: string
+    description?: string
+    location?: string
+    technologies?: string[]
     activities: string[]
     startDate: string
     endDate: string

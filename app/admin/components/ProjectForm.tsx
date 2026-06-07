@@ -3,8 +3,8 @@
 import React, { forwardRef, useEffect, useImperativeHandle } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Input } from "../../../@/components/ui/input";
-import { Button } from "../../../@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,10 +12,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../@/components/ui/form";
+} from "@/components/ui/form";
 import { z } from "zod";
-import { Textarea } from "../../../@/components/ui/textarea";
-import CustomDatePicker from "../../../app/components/dashboard/DatePicker";
+import { Textarea } from "@/components/ui/textarea";
+import CustomDatePicker from "@/app/components/dashboard/DatePicker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ImageUpload from "@/app/components/ui/image-upload";
 
@@ -87,7 +87,7 @@ const ProjectForm = forwardRef<
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
+      <form id="datatable-form" onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
         <FormField
           control={control}
           name="title"

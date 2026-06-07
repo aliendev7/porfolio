@@ -3,8 +3,11 @@ import { ProjectType, SocialLinkType } from "../app/components/types/types";
 
 
 export async function fetchJSON<T>(url: string): Promise<T> {
-    // Si es una ruta relativa, construir la URL completa
-    const fullUrl = url.startsWith('/') ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}${url}` : url;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    // Handle URLs that start with "undefined" (env var missing) or "/" (relative)
+    const fullUrl = url.startsWith('/') || url.startsWith('undefined')
+        ? `${baseUrl}${url.replace(/^undefined/, '')}`
+        : url;
 
     const response = await fetch(fullUrl, {
         method: "GET",
