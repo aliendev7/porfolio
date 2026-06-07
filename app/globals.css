@@ -4,6 +4,12 @@
 
 @layer base {
   :root {
+    /* Fonts — self-hosted via @fontsource (imported in app/layout.tsx).
+       Consumed through the Tailwind fontFamily mapping (poiret / sans / mono). */
+    --font-poiret: 'Poiret One', system-ui, sans-serif;
+    --font-open-sans: 'Open Sans Variable', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
     /* Base Colors */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
