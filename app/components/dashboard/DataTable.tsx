@@ -41,7 +41,6 @@ type DataTableProps<TData> = {
   data: TData[];
   columns: ColumnDef<TData, any>[];
   apiEndpoint: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   FormComponent: React.ComponentType<{
     initialData?: any;
     onSubmit: (data: any) => void;
