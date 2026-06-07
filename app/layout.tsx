@@ -8,11 +8,15 @@ import MainLayout from "./components/MainLayout";
 import type { Metadata } from "next";
 import "./globals.css";
 
-import { Poiret_One, Open_Sans, IBM_Plex_Mono } from "next/font/google";
-
-const poiret = Poiret_One({ subsets: ["latin"], weight: "400", variable: "--font-poiret" });
-const openSans = Open_Sans({ subsets: ["latin"], variable: "--font-open-sans" });
-const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono" });
+// Self-hosted fonts via @fontsource (served from npm — no build-time Google Fonts
+// fetch, so Vercel/CI builds don't depend on fonts.gstatic.com being reachable).
+// The CSS variables (--font-poiret / --font-open-sans / --font-mono) are defined
+// in globals.css and consumed through the Tailwind fontFamily mapping.
+import "@fontsource/poiret-one/latin-400.css";
+import "@fontsource-variable/open-sans/wght.css";
+import "@fontsource/ibm-plex-mono/latin-400.css";
+import "@fontsource/ibm-plex-mono/latin-500.css";
+import "@fontsource/ibm-plex-mono/latin-600.css";
 
 export const metadata: Metadata = {
   title: "dranzr",
@@ -40,7 +44,7 @@ export default function RootLayout({
   }
 
   return (
-    <html lang={initialLang} className={`${poiret.variable} ${openSans.variable} ${plexMono.variable}`} suppressHydrationWarning>
+    <html lang={initialLang} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -63,7 +67,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={openSans.className}>
+      <body className="font-sans">
         <ThemeProvider>
           <TanstackProvider>
             <LanguageProvider initialLang={initialLang}>
