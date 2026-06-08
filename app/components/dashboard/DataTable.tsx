@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import Modal from "../modal/Modal";
 import { toast } from "sonner";
+import { getAdminApiKey } from "@/lib/admin-auth";
 
 type DataTableProps<TData> = {
   entityName: string;
@@ -118,7 +119,10 @@ function DataTable<TData>({
         : apiEndpoint;
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": getAdminApiKey(),
+        },
         body: JSON.stringify(formData),
       });
       if (!response.ok) {
@@ -145,6 +149,7 @@ function DataTable<TData>({
     try {
       const response = await fetch(`${apiEndpoint}/${deleteSlug}`, {
         method: "DELETE",
+        headers: { "x-api-key": getAdminApiKey() },
       });
       if (!response.ok) {
         let message = `Failed to delete the ${entityName}`;

@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import ImageUpload from "@/app/components/ui/image-upload";
 import FileUpload from "@/app/components/ui/file-upload";
+import { getAdminApiKey } from "@/lib/admin-auth";
 
 // Validation schema
 const profileSchema = z.object({
@@ -78,7 +79,10 @@ const ProfilePage = () => {
     mutationFn: async (data: ProfileFormData) => {
       const res = await fetch('/api/user-details', {
         method: profile?.id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': getAdminApiKey(),
+        },
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error('Failed to update profile');
