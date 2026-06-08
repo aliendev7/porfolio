@@ -1,5 +1,3 @@
-"use server"
-
 import db from "@/lib/db";
 import { ok, serverError } from "@/lib/api";
 

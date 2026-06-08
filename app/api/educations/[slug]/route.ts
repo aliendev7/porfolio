@@ -46,6 +46,9 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
 
 export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
     try {
+        const education = await db.education.findUnique({ where: { slug: params.slug } });
+        if (!education) return fail(404, "Education not found");
+
         await db.education.delete({ where: { slug: params.slug } });
         return ok({ message: "Education deleted successfully" });
     } catch (error) {

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(req: NextRequest) {
+    if (req.method === 'GET') {
+        return NextResponse.next();
+    }
+
     const apiKey = req.headers.get('x-api-key');
 
     if (apiKey === process.env.ADMIN_API_KEY) {
@@ -11,5 +15,14 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/api/resources/:path*', '/api/resource-categories/:path*'],
+    matcher: [
+        '/api/resources/:path*',
+        '/api/resource-categories/:path*',
+        '/api/projects/:path*',
+        '/api/experiences/:path*',
+        '/api/educations/:path*',
+        '/api/skills/:path*',
+        '/api/skill-categories/:path*',
+        '/api/user-details/:path*',
+    ],
 };

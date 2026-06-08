@@ -11,7 +11,7 @@ import DataTable from '@/app/components/dashboard/DataTable';
 import PageHeader from '../components/PageHeader';
 
 const fetchCategories = async (): Promise<ResourceCategoryType[]> => {
-  const data = await fetchJSON<ResourceCategoryType[]>("/api/categories");
+  const data = await fetchJSON<ResourceCategoryType[]>("/api/resource-categories");
   return data ?? [];
 };
 
@@ -33,7 +33,7 @@ const CategoriesAdmin = () => {
         entityName="Category"
         data={categories ?? []}
         columns={categoryColumns}
-        apiEndpoint="/api/categories"
+        apiEndpoint="/api/resource-categories"
         FormComponent={CategoryForm}
         onDataUpdate={refetch}
         loading={isPending}

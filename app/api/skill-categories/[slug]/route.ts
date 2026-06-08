@@ -54,7 +54,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { slug:
         });
         if (!category) return fail(404, "Category not found");
         if (category.skills.length > 0) {
-            return fail(400, "Cannot delete category with existing skills. Please delete or reassign the skills first.");
+            return fail(409, "Cannot delete category with existing skills. Please delete or reassign the skills first.");
         }
 
         await db.skillCategory.delete({ where: { slug: params.slug } });

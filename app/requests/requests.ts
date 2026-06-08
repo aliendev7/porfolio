@@ -28,8 +28,7 @@ export const getHomeDataV2 = async (url?: string): Promise<HomeDataType | null> 
 
 export const getExperiencesV2 = async (): Promise<ExperienceType[] | []> => {
     try {
-        const data = await fetchJSON<ExperienceType[]>(`/api/experiences`) as any;
-        console.log('DATA', data);
+        const data = await fetchJSON<ExperienceType[]>(`/api/experiences`);
         return data ?? [];
     } catch (error) {
         console.warn('Error fetching experiences, returning empty array:', error);
@@ -63,7 +62,6 @@ export const getProjectsV2 = async (): Promise<ProjectType[] | []> => {
 export const getSocialLinksV2 = async (): Promise<SocialLinkType[] | []> => {
     try {
         const data = await fetchJSON<SocialLinkType[]>(`/api/user-social-links`);
-        console.log('SOCIALLINKS', JSON.stringify(data));
         return data ?? [];
     } catch (error) {
         console.warn('Error fetching social links, returning empty array:', error);

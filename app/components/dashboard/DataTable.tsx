@@ -121,7 +121,14 @@ function DataTable<TData>({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      if (!response.ok) throw new Error(`Failed to save the ${entityName}`);
+      if (!response.ok) {
+        let message = `Failed to save the ${entityName}`;
+        try {
+          const body = await response.json();
+          if (body?.message) message = body.message;
+        } catch {}
+        throw new Error(message);
+      }
       toast.success(`${entityName} ${editData ? "updated" : "created"} successfully`);
       setIsModalOpen(false);
       setEditData(null);
@@ -139,7 +146,14 @@ function DataTable<TData>({
       const response = await fetch(`${apiEndpoint}/${deleteSlug}`, {
         method: "DELETE",
       });
-      if (!response.ok) throw new Error(`Failed to delete the ${entityName}`);
+      if (!response.ok) {
+        let message = `Failed to delete the ${entityName}`;
+        try {
+          const body = await response.json();
+          if (body?.message) message = body.message;
+        } catch {}
+        throw new Error(message);
+      }
       toast.success(`${entityName} deleted successfully`);
       onDataUpdate();
     } catch (error) {

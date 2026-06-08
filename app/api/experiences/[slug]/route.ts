@@ -48,6 +48,10 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
 
 export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
     try {
+        const experience = await db.experience.findUnique({ where: { slug: params.slug } });
+        if (!experience) return fail(404, "Experience not found");
+
+        await db.experienceInput.deleteMany({ where: { experienceId: experience.id } });
         await db.experience.delete({ where: { slug: params.slug } });
         return ok({ message: "Experience deleted successfully" });
     } catch (error) {

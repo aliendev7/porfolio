@@ -55,6 +55,9 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
 
 export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
     try {
+        const project = await db.project.findUnique({ where: { slug: params.slug } });
+        if (!project) return fail(404, "Project not found");
+
         await db.project.delete({ where: { slug: params.slug } });
         return ok({ message: "Project deleted successfully" });
     } catch (error) {
